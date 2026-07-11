@@ -1,0 +1,106 @@
+/* Дизайн-токены. Тема "money-ledger": глубокий индиго-графит + тёплое золото
+   (ассоциация с деньгами), суммы набраны моноширинным шрифтом для табличной точности. */
+
+:root,
+[data-theme='dark'] {
+  --color-bg: #12141c;
+  --color-bg-elevated: #1a1d28;
+  --color-surface: #20232f;
+  --color-surface-hover: #262a38;
+  --color-border: #2c3040;
+  --color-text: #eef0f4;
+  --color-text-muted: #9aa1b2;
+  --color-accent: #d4a94f;
+  --color-accent-hover: #e6bd63;
+  --color-accent-text: #1a1408;
+  --color-danger: #e2665c;
+  --color-success: #4caf7d;
+  --color-scrollbar-track: transparent;
+  --color-scrollbar-thumb: #383d4f;
+  --color-scrollbar-thumb-hover: #4a5069;
+
+  --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='ocean'] {
+  --color-bg: #0b1520;
+  --color-bg-elevated: #101f2e;
+  --color-surface: #16283a;
+  --color-surface-hover: #1c3244;
+  --color-border: #223c52;
+  --color-text: #e7f1f7;
+  --color-text-muted: #8fa8ba;
+  --color-accent: #45c2b8;
+  --color-accent-hover: #5cd4ca;
+  --color-accent-text: #06211d;
+  --color-danger: #ef6f6f;
+  --color-success: #4fbf8b;
+  --color-scrollbar-track: transparent;
+  --color-scrollbar-thumb: #26425a;
+  --color-scrollbar-thumb-hover: #345b78;
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='forest'] {
+  --color-bg: #10190f;
+  --color-bg-elevated: #162214;
+  --color-surface: #1c2c1a;
+  --color-surface-hover: #22351f;
+  --color-border: #2e4229;
+  --color-text: #e9f2e6;
+  --color-text-muted: #9db494;
+  --color-accent: #7fb069;
+  --color-accent-hover: #93c17d;
+  --color-accent-text: #0d1a0b;
+  --color-danger: #e2665c;
+  --color-success: #7fb069;
+  --color-scrollbar-track: transparent;
+  --color-scrollbar-thumb: #33482f;
+  --color-scrollbar-thumb-hover: #445e40;
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='sand'] {
+  --color-bg: #f7f0e6;
+  --color-bg-elevated: #fffaf3;
+  --color-surface: #fffaf3;
+  --color-surface-hover: #f1e6d4;
+  --color-border: #e5d5bd;
+  --color-text: #2b2015;
+  --color-text-muted: #7a6a54;
+  --color-accent: #c1622d;
+  --color-accent-hover: #a8531f;
+  --color-accent-text: #fff8f0;
+  --color-danger: #b8453a;
+  --color-success: #4c7a4f;
+  --color-scrollbar-track: transparent;
+  --color-scrollbar-thumb: #ddc9a8;
+  --color-scrollbar-thumb-hover: #cbb388;
+  --shadow-elevated: 0 8px 24px rgba(60, 40, 10, 0.1);
+}
+
+[data-theme='light'] {
+  --color-bg: #f6f5f1;
+  --color-bg-elevated: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0eee7;
+  --color-border: #e2e0da;
+  --color-text: #1a1c22;
+  --color-text-muted: #6b7280;
+  --color-accent: #b8863a;
+  --color-accent-hover: #a4762f;
+  --color-accent-text: #ffffff;
+  --color-danger: #c94a3f;
+  --color-success: #2f8a5c;
+  --color-scrollbar-track: transparent;
+  --color-scrollbar-thumb: #d8d6cf;
+  --color-scrollbar-thumb-hover: #c3c1b8;
+  --shadow-elevated: 0 8px 24px rgba(20, 18, 10, 0.08);
+}

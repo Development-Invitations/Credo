@@ -1,0 +1,314 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Archive as ArchiveIcon, AlertTriangle, BellRing, ChevronRight } from 'lucide-react';
+import { supabase } from '../../lib/supabaseClient';
+import { useApp } from '../../context/AppContext';
+import { useUI } from '../../context/UIContext';
+import { Button } from '../../components/Button';
+import { AddDebtorModal } from '../../components/AddDebtorModal';
+import { RemindersModal } from '../../components/RemindersModal';
+import { ClientDetailDrawer } from '../../components/ClientDetailDrawer';
+import { ErrorBanner } from '../../components/ErrorBanner';
+
+interface ClientRow {
+  id: string;
+  full_name: string;
+  phone: string | null;
+}
+
+interface DebtRow {
+  id: string;
+  debtor_id: string;
+  amount: number;
+  paid_amount: number;
+  currency: string;
+  due_date: string | null;
+  status: 'active' | 'paid';
+}
+
+interface ClientWithTotals extends ClientRow {
+  activeDebts: DebtRow[];
+  overdue: boolean;
+  currencySums: { currency: string; amount: number }[];
+}
+
+function remainingOf(d: DebtRow) {
+  return Math.max(Number(d.amount) - Number(d.paid_amount || 0), 0);
+}
+
+function isDebtOverdue(d: DebtRow) {
+  return (
+    d.status === 'active' &&
+    remainingOf(d) > 0 &&
+    !!d.due_date &&
+    new Date(d.due_date) < new Date(new Date().toDateString())
+  );
+}
+
+export function Dashboard() {
+  const { t } = useTranslation();
+  const { currency } = useApp();
+  const { openRemindersDebtorId, clearOpenReminders, refreshNotifications } = useUI();
+  const [clients, setClients] = useState<ClientWithTotals[]>([]);
+  const [upcomingRemindersCount, setUpcomingRemindersCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [showAddClient, setShowAddClient] = useState(false);
+  const [remindersFor, setRemindersFor] = useState<ClientRow | null>(null);
+  const [detailClient, setDetailClient] = useState<ClientRow | null>(null);
+
+  async function loadClients() {
+    const { data: clientsData, error: clientsError } = await supabase
+      .from('debtors')
+      .select('id, full_name, phone')
+      .is('archived_at', null)
+      .order('created_at', { ascending: false });
+
+    if (clientsError) {
+      // eslint-disable-next-line no-console
+      console.error('Ошибка загрузки клиентов:', clientsError);
+      setLoadError(
+        clientsError.message.includes('column') ? t('dashboard.errorMigrationMissing') : t('dashboard.errorGeneric')
+      );
+      setClients([]);
+      setLoading(false);
+      return;
+    }
+
+    const list = clientsData ?? [];
+    const ids = list.map((c) => c.id);
+    let debts: DebtRow[] = [];
+
+    if (ids.length > 0) {
+      const { data: debtsData, error: debtsError } = await supabase
+        .from('debts')
+        .select('id, debtor_id, amount, paid_amount, currency, due_date, status')
+        .in('debtor_id', ids);
+
+      if (debtsError) {
+        // eslint-disable-next-line no-console
+        console.error('Ошибка загрузки долгов:', debtsError);
+        setLoadError(
+          debtsError.message.includes('relation') || debtsError.message.includes('does not exist')
+            ? t('dashboard.errorDebtsTableMissing')
+            : t('dashboard.errorGeneric')
+        );
+      } else {
+        setLoadError(null);
+      }
+      debts = debtsData ?? [];
+    } else {
+      setLoadError(null);
+    }
+
+    const byClient: Record<string, DebtRow[]> = {};
+    for (const d of debts) {
+      (byClient[d.debtor_id] ??= []).push(d);
+    }
+
+    const withTotals: ClientWithTotals[] = list.map((c) => {
+      const clientDebts = byClient[c.id] ?? [];
+      const activeDebts = clientDebts.filter((d) => d.status === 'active' && remainingOf(d) > 0);
+      const overdue = activeDebts.some(isDebtOverdue);
+      const sumsMap: Record<string, number> = {};
+      for (const d of activeDebts) sumsMap[d.currency] = (sumsMap[d.currency] || 0) + remainingOf(d);
+      const currencySums = Object.entries(sumsMap).map(([currency, amount]) => ({ currency, amount }));
+      return { ...c, activeDebts, overdue, currencySums };
+    });
+
+    setClients(withTotals);
+    setLoading(false);
+  }
+
+  async function loadUpcomingReminders() {
+    const { count } = await supabase
+      .from('reminders')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_done', false)
+      .gte('remind_at', new Date().toISOString());
+    setUpcomingRemindersCount(count ?? 0);
+  }
+
+  useEffect(() => {
+    loadClients();
+    loadUpcomingReminders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (openRemindersDebtorId && clients.length > 0) {
+      const target = clients.find((c) => c.id === openRemindersDebtorId);
+      if (target) {
+        setRemindersFor(target);
+        clearOpenReminders();
+      }
+    }
+  }, [openRemindersDebtorId, clients, clearOpenReminders]);
+
+  async function archiveClient(client: ClientWithTotals) {
+    const hasOutstanding = client.currencySums.length > 0;
+    if (hasOutstanding && !window.confirm(t('archive.confirmWithDebt') ?? '')) return;
+    await supabase.from('debtors').update({ archived_at: new Date().toISOString() }).eq('id', client.id);
+    loadClients();
+    refreshNotifications();
+  }
+
+  const sortedClients = useMemo(
+    () => [...clients].sort((a, b) => Number(b.overdue) - Number(a.overdue)),
+    [clients]
+  );
+
+  const kpiTotalsByCurrency = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const c of clients) for (const s of c.currencySums) map[s.currency] = (map[s.currency] || 0) + s.amount;
+    return Object.entries(map).map(([currency, amount]) => ({ currency, amount }));
+  }, [clients]);
+
+  const activeCount = clients.filter((c) => c.activeDebts.length > 0).length;
+  const overdueCount = clients.filter((c) => c.overdue).length;
+
+  return (
+    <div style={{ maxWidth: 900, margin: '32px auto', padding: '0 24px 40px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h1>{t('dashboard.title')}</h1>
+        <Button onClick={() => setShowAddClient(true)}>{t('dashboard.addDebtor')}</Button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
+        <div className="card">
+          <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('dashboard.kpiTotalDebt')}</div>
+          {kpiTotalsByCurrency.length === 0 ? (
+            <div className="amount" style={{ fontSize: 22, fontWeight: 700 }}>0 {currency}</div>
+          ) : (
+            kpiTotalsByCurrency.map((s) => (
+              <div key={s.currency} className="amount" style={{ fontSize: 20, fontWeight: 700 }}>
+                {s.amount.toLocaleString()} {s.currency}
+              </div>
+            ))
+          )}
+        </div>
+        <div className="card">
+          <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('dashboard.kpiActiveDebtors')}</div>
+          <div style={{ fontSize: 22, fontWeight: 700 }}>{activeCount}</div>
+        </div>
+        <div className="card">
+          <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('dashboard.kpiOverdue')}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-danger)' }}>{overdueCount}</div>
+        </div>
+        <div className="card">
+          <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('dashboard.kpiUpcomingReminders')}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-accent)' }}>{upcomingRemindersCount}</div>
+        </div>
+      </div>
+
+      {loadError && <div style={{ marginBottom: 16 }}><ErrorBanner>{loadError}</ErrorBanner></div>}
+
+      {!loading && !loadError && clients.length === 0 && (
+        <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
+          {t('dashboard.noDebtors')}
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gap: 10 }}>
+        {sortedClients.map((c) => (
+          <div
+            key={c.id}
+            className="card"
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer',
+              borderColor: c.overdue ? 'var(--color-danger)' : 'var(--color-border)',
+              background: c.overdue ? 'color-mix(in srgb, var(--color-danger) 8%, var(--color-surface))' : 'var(--color-surface)',
+            }}
+            onClick={() => setDetailClient(c)}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                {c.overdue && <AlertTriangle size={14} color="var(--color-danger)" />}
+                <span>{c.full_name}</span>
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  padding: '2px 8px',
+                  borderRadius: 20,
+                  background: c.overdue ? 'var(--color-danger)' : c.activeDebts.length === 0 ? 'var(--color-success)' : 'var(--color-accent)',
+                  color: '#fff',
+                }}
+              >
+                {c.overdue
+                  ? t('dashboard.statusOverdue')
+                  : c.activeDebts.length === 0
+                  ? t('dashboard.statusPaid')
+                  : t('dashboard.statusActive')}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={(e) => e.stopPropagation()}>
+              {c.currencySums.length > 0 && (
+                <span className="amount" style={{ fontSize: 15 }}>
+                  {c.currencySums.map((s) => `${s.amount.toLocaleString()} ${s.currency}`).join(' + ')}
+                </span>
+              )}
+              <Button
+                variant="secondary"
+                onClick={() => setRemindersFor(c)}
+                style={{ display: 'flex', alignItems: 'center', padding: '8px 10px' }}
+                title={t('dashboard.viewReminders') ?? ''}
+              >
+                <BellRing size={15} />
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => archiveClient(c)}
+                style={{ display: 'flex', alignItems: 'center', padding: '8px 10px' }}
+                title={t('archive.archiveAction') ?? ''}
+              >
+                <ArchiveIcon size={15} />
+              </Button>
+              <ChevronRight size={16} color="var(--color-text-muted)" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {showAddClient && (
+        <AddDebtorModal
+          onClose={() => setShowAddClient(false)}
+          onCreated={(newId) => {
+            loadClients();
+            // Сразу открываем карточку нового клиента, чтобы можно было тут же вписать первый долг
+            setDetailClient({ id: newId, full_name: '', phone: null });
+          }}
+        />
+      )}
+
+      {remindersFor && (
+        <RemindersModal
+          debtorId={remindersFor.id}
+          debtorName={remindersFor.full_name}
+          onClose={() => {
+            setRemindersFor(null);
+            loadUpcomingReminders();
+            refreshNotifications();
+          }}
+        />
+      )}
+
+      {detailClient && (
+        <ClientDetailDrawer
+          clientId={detailClient.id}
+          clientName={clients.find((c) => c.id === detailClient.id)?.full_name || detailClient.full_name}
+          clientPhone={clients.find((c) => c.id === detailClient.id)?.phone ?? detailClient.phone}
+          defaultCurrency={currency}
+          onClose={() => setDetailClient(null)}
+          onDebtsChanged={() => {
+            loadClients();
+            refreshNotifications();
+          }}
+        />
+      )}
+    </div>
+  );
+}
