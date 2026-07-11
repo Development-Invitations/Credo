@@ -5,7 +5,7 @@ import { useUI } from '../context/UIContext';
 
 export function UpdateBanner() {
   const { t } = useTranslation();
-  const { updateAvailable, latestVersion } = useUI();
+  const { updateAvailable, latestVersion, startDownload } = useUI();
   const [dismissedVersion, setDismissedVersion] = useState<string | null>(null);
 
   if (!updateAvailable || !latestVersion) return null;
@@ -30,7 +30,7 @@ export function UpdateBanner() {
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
-          onClick={() => window.open(latestVersion.download_url, '_blank')}
+          onClick={startDownload}
           style={{
             background: 'var(--color-accent)',
             color: 'var(--color-accent-text)',

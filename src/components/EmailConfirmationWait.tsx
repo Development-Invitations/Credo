@@ -73,7 +73,8 @@ export function EmailConfirmationWait({ email, password, onConfirmed, onBack }: 
   }
 
   return (
-    <div className="card" style={{ maxWidth: 420, margin: '80px auto', textAlign: 'center', boxShadow: 'var(--shadow-elevated)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+      <div className="card" style={{ width: '100%', maxWidth: 420, textAlign: 'center', boxShadow: 'var(--shadow-elevated)' }}>
       <div
         style={{
           width: 40,
@@ -108,6 +109,7 @@ export function EmailConfirmationWait({ email, password, onConfirmed, onBack }: 
             ? t('onboarding.resendCooldown', { seconds: resendCooldown })
             : t('onboarding.resendEmail')}
         </Button>
+      </div>
       </div>
     </div>
   );

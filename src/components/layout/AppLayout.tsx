@@ -8,6 +8,7 @@ import { AppFooter } from './AppFooter';
 import { Drawer } from '../Drawer';
 import { SettingsPanelContent } from '../SettingsPanelContent';
 import { UpdateBanner } from '../UpdateBanner';
+import { UpdateProgressOverlay } from '../UpdateProgressOverlay';
 import { UIProvider } from '../../context/UIContext';
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
@@ -43,6 +44,8 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
       <Drawer open={settingsOpen} onClose={() => setSettingsOpen(false)} title={t('settings.title')}>
         <SettingsPanelContent />
       </Drawer>
+
+      <UpdateProgressOverlay />
     </div>
   );
 }

@@ -1,5 +1,6 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
+const { autoUpdater } = require('electron-updater');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -7,8 +8,10 @@ const isDev = process.env.NODE_ENV === 'development';
 // чтобы показать пользователю баннер "доступно обновление".
 const APP_VERSION = require('../package.json').version;
 
+let mainWindow;
+
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 960,
@@ -23,15 +26,62 @@ function createWindow() {
     },
   });
 
+  // Ссылки, открываемые через window.open() (например "Скачать обновление" в браузере,
+  // когда автообновление недоступно) должны идти в системный браузер, а не создавать
+  // новое пустое окно Electron.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
   if (isDev) {
-    win.loadURL('http://localhost:5173');
+    mainWindow.loadURL('http://localhost:5173');
   } else {
-    win.loadFile(path.join(__dirname, '../dist/index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 }
 
 // Позволяет фронтенду узнать текущую версию через window.electronAPI.getAppVersion()
 ipcMain.handle('app:getVersion', () => APP_VERSION);
+
+// --- Автообновление через electron-updater (источник — GitHub Releases) ---
+// Скачивание запускается только по явному запросу из интерфейса (не автоматически в фоне),
+// чтобы пользователь видел прогресс и сам решал, когда обновляться.
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = false;
+
+ipcMain.handle('update:check', async () => {
+  if (isDev) return { available: false };
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    return { available: !!result?.updateInfo && result.updateInfo.version !== APP_VERSION };
+  } catch (e) {
+    return { available: false, error: e.message };
+  }
+});
+
+ipcMain.handle('update:download', async () => {
+  try {
+    await autoUpdater.downloadUpdate();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+});
+
+ipcMain.handle('update:install', () => {
+  autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on('download-progress', (progress) => {
+  mainWindow?.webContents.send('update:progress', progress.percent);
+});
+autoUpdater.on('update-downloaded', () => {
+  mainWindow?.webContents.send('update:downloaded');
+});
+autoUpdater.on('error', (err) => {
+  mainWindow?.webContents.send('update:error', err.message);
+});
 
 app.whenReady().then(() => {
   createWindow();

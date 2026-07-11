@@ -40,6 +40,13 @@ interface UIContextValue {
   changelogRequested: boolean;
   requestChangelog: () => void;
   clearChangelogRequest: () => void;
+
+  downloadStatus: 'idle' | 'downloading' | 'downloaded' | 'error';
+  downloadProgress: number;
+  downloadError: string | null;
+  startDownload: () => void;
+  installNow: () => void;
+  dismissDownload: () => void;
 }
 
 const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -66,6 +73,44 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
   }, [latestVersion]);
 
   const [changelogRequested, setChangelogRequested] = useState(false);
+
+  const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'downloaded' | 'error'>('idle');
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.electronAPI?.onUpdateProgress?.((percent) => setDownloadProgress(Math.round(percent)));
+    window.electronAPI?.onUpdateDownloaded?.(() => setDownloadStatus('downloaded'));
+    window.electronAPI?.onUpdateError?.((message) => {
+      setDownloadStatus('error');
+      setDownloadError(message);
+    });
+  }, []);
+
+  const startDownload = useCallback(async () => {
+    if (!window.electronAPI?.downloadUpdate) {
+      // Не в Electron (например веб-версия для разработки) — просто открываем ссылку в браузере
+      if (latestVersion) window.open(latestVersion.download_url, '_blank');
+      return;
+    }
+    setDownloadStatus('downloading');
+    setDownloadProgress(0);
+    setDownloadError(null);
+    const result = await window.electronAPI.downloadUpdate();
+    if (result && result.ok === false) {
+      setDownloadStatus('error');
+      setDownloadError(result.error ?? null);
+    }
+  }, [latestVersion]);
+
+  const installNow = useCallback(() => {
+    window.electronAPI?.installUpdate?.();
+  }, []);
+
+  const dismissDownload = useCallback(() => {
+    setDownloadStatus('idle');
+    setDownloadError(null);
+  }, []);
 
   const refreshNotifications = useCallback(async () => {
     const today = new Date().toISOString().slice(0, 10);
@@ -172,6 +217,12 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
         changelogRequested,
         requestChangelog: () => setChangelogRequested(true),
         clearChangelogRequest: () => setChangelogRequested(false),
+        downloadStatus,
+        downloadProgress,
+        downloadError,
+        startDownload,
+        installNow,
+        dismissDownload,
       }}
     >
       {children}

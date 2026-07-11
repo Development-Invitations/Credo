@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
-declare global {
-  interface Window {
-    electronAPI?: { getAppVersion: () => Promise<string> };
-  }
-}
-
 interface LatestVersion {
   version: string;
   download_url: string;

@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-declare global {
-  interface Window {
-    electronAPI?: { getAppVersion: () => Promise<string> };
-  }
-}
-
 export function AppFooter() {
   const [version, setVersion] = useState('0.1.0');
 

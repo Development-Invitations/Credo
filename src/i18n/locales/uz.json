@@ -176,11 +176,19 @@
     "memberSince": "Ilovada"
   },
   "update": {
-    "available": "Credo v{{version}} yangi versiyasi mavjud"
+    "available": "Credo v{{version}} yangi versiyasi mavjud",
+    "downloading": "Yangilanish yuklanmoqda...",
+    "readyTitle": "Yangilanish tayyor",
+    "readyText": "Ilova qayta ishga tushadi va yangi versiyani o'rnatadi. Bu bir necha soniya vaqt oladi.",
+    "later": "Keyinroq",
+    "restartNow": "Hozir qayta ishga tushirish",
+    "errorTitle": "Yangilanishni yuklab bo'lmadi",
+    "errorText": "Internet aloqasini tekshiring va keyinroq qayta urinib ko'ring."
   },
   "changelog": {
     "title": "Yangilanishlar tarixi",
-    "empty": "Hozircha yangilanishlar tarixi yo'q"
+    "empty": "Hozircha yangilanishlar tarixi yo'q",
+    "latest": "Oxirgi"
   },
   "toast": {
     "enterAmount": "To'lov summasini kiriting"

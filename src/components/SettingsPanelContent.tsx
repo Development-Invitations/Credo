@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabaseClient';
 import { SUPPORTED_LANGUAGES } from '../i18n';
 import { CURRENCIES } from '../lib/currency';
 import { THEMES } from '../lib/themes';
-import { History } from 'lucide-react';
+import { History, X } from 'lucide-react';
 import { Button } from './Button';
 import { SettingsRow } from './SettingsRow';
 import { ErrorBanner } from './ErrorBanner';
@@ -25,6 +25,7 @@ export function SettingsPanelContent() {
     markUpdateSeen,
     changelogRequested,
     clearChangelogRequest,
+    startDownload,
   } = useUI();
   const [currencyPrompt, setCurrencyPrompt] = useState<{ lang: string; suggested: string } | null>(null);
   const [showChangelog, setShowChangelog] = useState(false);
@@ -155,7 +156,7 @@ export function SettingsPanelContent() {
             <div style={{ color: 'var(--color-accent)', marginBottom: 8, fontSize: 13 }}>
               {t('settings.updateAvailable')}: v{latestVersion!.version}
             </div>
-            <Button onClick={() => window.open(latestVersion!.download_url, '_blank')} style={{ width: '100%' }}>
+            <Button onClick={startDownload} style={{ width: '100%' }}>
               {t('settings.downloadUpdate')}
             </Button>
           </div>
@@ -254,10 +255,21 @@ export function SettingsPanelContent() {
         >
           <div
             className="card"
-            style={{ width: 420, maxHeight: '75vh', overflowY: 'auto', boxShadow: 'var(--shadow-elevated)' }}
+            style={{ width: 460, maxHeight: '78vh', overflowY: 'auto', boxShadow: 'var(--shadow-elevated)' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ marginBottom: 14 }}>{t('changelog.title')}</h3>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <History size={17} color="var(--color-accent)" />
+                {t('changelog.title')}
+              </h3>
+              <button
+                onClick={() => setShowChangelog(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 4, display: 'flex' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
             {changelog.length === 0 && (
               <div style={{ color: 'var(--color-text-muted)', fontSize: 13, textAlign: 'center', padding: '12px 0' }}>
                 {t('changelog.empty')}
@@ -265,15 +277,48 @@ export function SettingsPanelContent() {
             )}
             <div style={{ display: 'grid', gap: 10 }}>
               {changelog.map((v, i) => (
-                <div key={i} style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 10 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontWeight: 600, fontSize: 13 }}>v{v.version}</span>
+                <div
+                  key={i}
+                  style={{
+                    background: 'var(--color-surface-hover)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '12px 14px',
+                    border: i === 0 ? '1px solid var(--color-accent)' : '1px solid transparent',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 13,
+                        color: i === 0 ? 'var(--color-accent)' : 'var(--color-text)',
+                      }}
+                    >
+                      v{v.version}
+                      {i === 0 && (
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            padding: '2px 7px',
+                            borderRadius: 20,
+                            background: 'var(--color-accent)',
+                            color: 'var(--color-accent-text)',
+                          }}
+                        >
+                          {t('changelog.latest')}
+                        </span>
+                      )}
+                    </span>
                     <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
                       {new Date(v.released_at).toLocaleDateString()}
                     </span>
                   </div>
                   {v.release_notes && (
-                    <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{v.release_notes}</div>
+                    <div style={{ fontSize: 12, color: 'var(--color-text-muted)', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+                      {v.release_notes}
+                    </div>
                   )}
                 </div>
               ))}

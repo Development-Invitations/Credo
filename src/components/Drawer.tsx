@@ -44,15 +44,14 @@ export function Drawer({ open, onClose, title, children }: Props) {
         style={{
           position: 'absolute',
           top: 0,
-          right: 0,
+          right: open ? 0 : -420,
           height: '100%',
           width: 380,
           maxWidth: '90vw',
           background: 'var(--color-bg-elevated)',
           borderLeft: '1px solid var(--color-border)',
           boxShadow: 'var(--shadow-elevated)',
-          transform: open ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'right 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
           display: 'flex',
           flexDirection: 'column',
         }}

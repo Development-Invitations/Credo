@@ -67,9 +67,9 @@ export function RegisterStep() {
   }
 
   return (
-    <div style={{ margin: '80px auto', maxWidth: 420 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
       <OnboardingBrand />
-      <div className="card" style={{ boxShadow: 'var(--shadow-elevated)' }}>
+      <div className="card" style={{ width: '100%', maxWidth: 420, boxShadow: 'var(--shadow-elevated)' }}>
       <h1 style={{ marginBottom: 24, textAlign: 'center' }}>{t('onboarding.createAccount')}</h1>
 
       <form onSubmit={handleRegister} style={{ display: 'grid', gap: 12 }}>
