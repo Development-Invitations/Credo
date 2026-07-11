@@ -62,6 +62,7 @@ ipcMain.handle('update:check', async () => {
 
 ipcMain.handle('update:download', async () => {
   try {
+    await autoUpdater.checkForUpdates();
     await autoUpdater.downloadUpdate();
     return { ok: true };
   } catch (e) {
