@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useApp } from '../../context/AppContext';
 import { Button } from '../../components/Button';
 import { ClientDetailDrawer } from '../../components/ClientDetailDrawer';
+import { HelpTooltip } from '../../components/HelpTooltip';
 
 interface Client {
   id: string;
@@ -41,7 +42,10 @@ export function ArchivePage() {
 
   return (
     <div style={{ maxWidth: 860, margin: '32px auto', padding: '0 24px 40px' }}>
-      <h1 style={{ marginBottom: 8 }}>{t('sidebar.archive')}</h1>
+      <h1 style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+        {t('sidebar.archive')}
+        <HelpTooltip text={t('help.archive')} />
+      </h1>
       <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 24 }}>{t('archive.explainer')}</p>
 
       {!loading && clients.length === 0 && (

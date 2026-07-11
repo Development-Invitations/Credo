@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Download } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { ErrorBanner } from '../../components/ErrorBanner';
+import { HelpTooltip } from '../../components/HelpTooltip';
+import { Button } from '../../components/Button';
 import { ClientReportRow, DebtWithPayments, ReminderRow } from '../../components/ClientReportRow';
 
 interface ClientEntry {
@@ -13,12 +16,12 @@ interface ClientEntry {
   reminders: ReminderRow[];
 }
 
+type DateRange = 'all' | 'month' | '30days';
+
 export function ReportsPage() {
   const { t } = useTranslation();
   const [clients, setClients] = useState<ClientEntry[]>([]);
-  const [totalDebtsCount, setTotalDebtsCount] = useState(0);
-  const [overdueClientsCount, setOverdueClientsCount] = useState(0);
-  const [chartData, setChartData] = useState<{ currency: string; active: number; paid: number }[]>([]);
+  const [range, setRange] = useState<DateRange>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,27 +85,6 @@ export function ReportsPage() {
         }));
 
         setClients(clientEntries);
-        setTotalDebtsCount((debtsData ?? []).length);
-
-        const today = new Date().toISOString().slice(0, 10);
-        setOverdueClientsCount(
-          clientEntries.filter((c) =>
-            c.debts.some((d) => {
-              const remaining = Number(d.amount) - Number(d.paid_amount || 0);
-              return d.status === 'active' && remaining > 0 && !!d.due_date && d.due_date < today;
-            })
-          ).length
-        );
-
-        const byCurrency: Record<string, { currency: string; active: number; paid: number }> = {};
-        for (const d of debtsData ?? []) {
-          const row = (byCurrency[d.currency] ??= { currency: d.currency, active: 0, paid: 0 });
-          const remaining = Math.max(Number(d.amount) - Number(d.paid_amount || 0), 0);
-          if (d.status === 'active') row.active += remaining;
-          else row.paid += Number(d.amount);
-        }
-        setChartData(Object.values(byCurrency));
-
         setError(null);
       } catch (e: any) {
         // eslint-disable-next-line no-console
@@ -119,16 +101,117 @@ export function ReportsPage() {
     load();
   }, [t]);
 
+  const rangeStart = useMemo(() => {
+    const now = new Date();
+    if (range === 'month') return new Date(now.getFullYear(), now.getMonth(), 1);
+    if (range === '30days') return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    return null;
+  }, [range]);
+
+  const debtsInRange = useMemo(() => {
+    const all = clients.flatMap((c) => c.debts);
+    if (!rangeStart) return all;
+    return all.filter((d) => new Date(d.created_at) >= rangeStart);
+  }, [clients, rangeStart]);
+
+  const overdueList = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const result: { id: string; full_name: string; amount: number; currency: string; due_date: string }[] = [];
+    for (const c of clients) {
+      for (const d of c.debts) {
+        const remaining = Number(d.amount) - Number(d.paid_amount || 0);
+        if (d.status === 'active' && remaining > 0 && d.due_date && d.due_date < today) {
+          result.push({ id: d.id, full_name: c.full_name, amount: remaining, currency: d.currency, due_date: d.due_date });
+        }
+      }
+    }
+    return result;
+  }, [clients]);
+
+  const chartData = useMemo(() => {
+    const byCurrency: Record<string, { currency: string; active: number; paid: number }> = {};
+    for (const d of debtsInRange) {
+      const row = (byCurrency[d.currency] ??= { currency: d.currency, active: 0, paid: 0 });
+      const remaining = Math.max(Number(d.amount) - Number(d.paid_amount || 0), 0);
+      if (d.status === 'active') row.active += remaining;
+      else row.paid += Number(d.amount);
+    }
+    return Object.values(byCurrency);
+  }, [debtsInRange]);
+
+  function exportCsv() {
+    const rows: string[] = ['Клиент,Сумма,Валюта,Остаток,Срок,Статус,Комментарий,Дата создания'];
+    for (const c of clients) {
+      for (const d of c.debts) {
+        const remaining = Math.max(Number(d.amount) - Number(d.paid_amount || 0), 0);
+        rows.push(
+          [
+            c.full_name,
+            d.amount,
+            d.currency,
+            remaining,
+            d.due_date ?? '',
+            d.status,
+            (d.comment ?? '').replace(/,/g, ';'),
+            new Date(d.created_at).toLocaleDateString(),
+          ].join(',')
+        );
+      }
+    }
+    const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `credo-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const rangeButtons: { key: DateRange; label: string }[] = [
+    { key: 'all', label: t('report.rangeAll') },
+    { key: 'month', label: t('report.rangeMonth') },
+    { key: '30days', label: t('report.range30days') },
+  ];
+
   return (
     <div style={{ maxWidth: 900, margin: '32px auto', padding: '0 24px 40px' }}>
-      <h1 style={{ marginBottom: 24 }}>{t('report.title')}</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {t('report.title')}
+          <HelpTooltip text={t('help.report')} />
+        </h1>
+        <Button variant="secondary" onClick={exportCsv} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Download size={15} />
+          {t('report.exportCsv')}
+        </Button>
+      </div>
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+        {rangeButtons.map((rb) => (
+          <button
+            key={rb.key}
+            onClick={() => setRange(rb.key)}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 20,
+              border: '1px solid var(--color-border)',
+              background: range === rb.key ? 'var(--color-accent)' : 'transparent',
+              color: range === rb.key ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
+              fontSize: 13,
+              cursor: 'pointer',
+            }}
+          >
+            {rb.label}
+          </button>
+        ))}
+      </div>
 
       {error && <div style={{ marginBottom: 16 }}><ErrorBanner>{error}</ErrorBanner></div>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
         <div className="card">
           <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('report.totalDebts')}</div>
-          <div style={{ fontSize: 22, fontWeight: 700 }}>{totalDebtsCount}</div>
+          <div style={{ fontSize: 22, fontWeight: 700 }}>{debtsInRange.length}</div>
         </div>
         <div className="card">
           <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('sidebar.debtors')}</div>
@@ -136,7 +219,7 @@ export function ReportsPage() {
         </div>
         <div className="card">
           <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('report.overdueClients')}</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-danger)' }}>{overdueClientsCount}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-danger)' }}>{overdueList.length}</div>
         </div>
       </div>
 
@@ -155,6 +238,12 @@ export function ReportsPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      )}
+
+      {!loading && !error && chartData.length === 0 && (
+        <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)', marginBottom: 24 }}>
+          {t('report.noData')}
         </div>
       )}
 

@@ -8,6 +8,8 @@ import { SUPPORTED_LANGUAGES } from '../i18n';
 import { CURRENCIES } from '../lib/currency';
 import { THEMES } from '../lib/themes';
 import { History, X } from 'lucide-react';
+import { Checkbox } from './Checkbox';
+import { isSoundEnabled } from '../lib/sound';
 import { Button } from './Button';
 import { SettingsRow } from './SettingsRow';
 import { ErrorBanner } from './ErrorBanner';
@@ -28,6 +30,18 @@ export function SettingsPanelContent() {
     startDownload,
   } = useUI();
   const [currencyPrompt, setCurrencyPrompt] = useState<{ lang: string; suggested: string } | null>(null);
+  const [soundOn, setSoundOn] = useState(isSoundEnabled());
+  const [callingOn, setCallingOn] = useState(localStorage.getItem('callingEnabled') === 'true');
+
+  function toggleSound(checked: boolean) {
+    setSoundOn(checked);
+    localStorage.setItem('soundEnabled', checked ? 'true' : 'false');
+  }
+
+  function toggleCalling(checked: boolean) {
+    setCallingOn(checked);
+    localStorage.setItem('callingEnabled', checked ? 'true' : 'false');
+  }
   const [showChangelog, setShowChangelog] = useState(false);
   const [changelog, setChangelog] = useState<{ version: string; released_at: string; release_notes: string | null }[]>([]);
 
@@ -146,6 +160,21 @@ export function SettingsPanelContent() {
         </div>
       </SettingsRow>
 
+      <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: 14 }}>{t('settings.soundToggle')}</span>
+        <Checkbox checked={soundOn} onChange={toggleSound} />
+      </div>
+
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 14 }}>{t('settings.callingToggle')}</span>
+          <Checkbox checked={callingOn} onChange={toggleCalling} />
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8, lineHeight: 1.5 }}>
+          {t('settings.callingHint')}
+        </p>
+      </div>
+
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 14 }}>{t('settings.version')}</span>
@@ -255,7 +284,7 @@ export function SettingsPanelContent() {
         >
           <div
             className="card"
-            style={{ width: 460, maxHeight: '78vh', overflowY: 'auto', boxShadow: 'var(--shadow-elevated)' }}
+            style={{ width: 560, maxHeight: '82vh', overflowY: 'auto', boxShadow: 'var(--shadow-elevated)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>

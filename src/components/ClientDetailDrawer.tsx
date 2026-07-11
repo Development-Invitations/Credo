@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, BellRing } from 'lucide-react';
+import { Plus, BellRing, Phone, Copy } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { Drawer } from './Drawer';
 import { Button } from './Button';
 import { DebtItem, DebtRow } from './DebtItem';
 import { AddDebtModal } from './AddDebtModal';
 import { RemindersModal } from './RemindersModal';
+import { HelpTooltip } from './HelpTooltip';
 
 interface Props {
   clientId: string;
@@ -24,6 +25,7 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
   const [loading, setLoading] = useState(true);
   const [showAddDebt, setShowAddDebt] = useState(false);
   const [showReminders, setShowReminders] = useState(false);
+  const callingEnabled = localStorage.getItem('callingEnabled') === 'true';
 
   async function load() {
     const { data } = await supabase
@@ -43,7 +45,49 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
 
   return (
     <Drawer open onClose={onClose} title={clientName}>
-      {clientPhone && <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 16 }}>{clientPhone}</div>}
+      {clientPhone && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 16 }}>
+          <span>{clientPhone}</span>
+          {callingEnabled && (
+            <button
+              onClick={() => window.open(`tel:${clientPhone.replace(/\s/g, '')}`)}
+              title={t('clientDetail.call') ?? ''}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                color: 'var(--color-accent)',
+                cursor: 'pointer',
+                display: 'flex',
+                padding: 4,
+                borderRadius: 'var(--radius-sm)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <Phone size={14} />
+            </button>
+          )}
+          <button
+            onClick={() => navigator.clipboard.writeText(clientPhone)}
+            title={t('clientDetail.copyPhone') ?? ''}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              color: 'var(--color-text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              padding: 4,
+              borderRadius: 'var(--radius-sm)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          >
+            <Copy size={14} />
+          </button>
+        </div>
+      )}
 
       {readOnly && (
         <div
@@ -73,7 +117,10 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
         </div>
       )}
 
-      <h3 style={{ fontSize: 14, marginBottom: 10, color: 'var(--color-text-muted)' }}>{t('clientDetail.debtsHistory')}</h3>
+      <h3 style={{ fontSize: 14, marginBottom: 10, color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        {t('clientDetail.debtsHistory')}
+        <HelpTooltip text={t('help.clientDetail')} />
+      </h3>
 
       {!loading && debts.length === 0 && (
         <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 13 }}>

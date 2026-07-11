@@ -1,7 +1,12 @@
 let ctx: AudioContext | null = null;
 
+export function isSoundEnabled(): boolean {
+  return localStorage.getItem('soundEnabled') !== 'false';
+}
+
 /** Короткий двухтональный "дзынь" без внешнего аудиофайла — через осциллятор браузера. */
 export function playNotificationSound() {
+  if (!isSoundEnabled()) return;
   try {
     if (!ctx) ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const now = ctx.currentTime;

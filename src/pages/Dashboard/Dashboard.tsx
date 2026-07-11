@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Archive as ArchiveIcon, AlertTriangle, BellRing, ChevronRight, ArrowUpDown } from 'lucide-react';
+import { Archive as ArchiveIcon, AlertTriangle, BellRing, ChevronRight, ArrowUpDown, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useApp } from '../../context/AppContext';
 import { useUI } from '../../context/UIContext';
@@ -10,6 +10,7 @@ import { RemindersModal } from '../../components/RemindersModal';
 import { ClientDetailDrawer } from '../../components/ClientDetailDrawer';
 import { ErrorBanner } from '../../components/ErrorBanner';
 import { Pagination } from '../../components/Pagination';
+import { HelpTooltip } from '../../components/HelpTooltip';
 
 interface ClientRow {
   id: string;
@@ -75,6 +76,7 @@ export function Dashboard() {
   const [activeTab, setActiveTab] = useState<StatusFilter>('all');
   const [dateSort, setDateSort] = useState<DateSort>('newest');
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
 
   async function loadClients() {
     const { data: clientsData, error: clientsError } = await supabase
@@ -166,7 +168,7 @@ export function Dashboard() {
 
   useEffect(() => {
     setPage(1);
-  }, [activeTab, dateSort]);
+  }, [activeTab, dateSort, search]);
 
   async function archiveClient(client: ClientWithTotals) {
     const hasOutstanding = client.currencySums.length > 0;
@@ -189,6 +191,10 @@ export function Dashboard() {
 
   const filteredSorted = useMemo(() => {
     let list = activeTab === 'all' ? clients : clients.filter((c) => clientStatus(c) === activeTab);
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter((c) => c.full_name.toLowerCase().includes(q) || (c.phone ?? '').includes(q));
+    }
     list = [...list].sort((a, b) => {
       if (activeTab === 'all') {
         const overdueDiff = Number(b.overdue) - Number(a.overdue);
@@ -198,7 +204,7 @@ export function Dashboard() {
       return dateSort === 'newest' ? -diff : diff;
     });
     return list;
-  }, [clients, activeTab, dateSort]);
+  }, [clients, activeTab, dateSort, search]);
 
   const totalPages = Math.max(1, Math.ceil(filteredSorted.length / PAGE_SIZE));
   const pageClients = filteredSorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -221,7 +227,10 @@ export function Dashboard() {
   return (
     <div style={{ maxWidth: 900, margin: '32px auto', padding: '0 24px 40px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1>{t('dashboard.title')}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <h1>{t('dashboard.title')}</h1>
+          <HelpTooltip text={t('help.dashboard')} />
+        </div>
         <Button onClick={() => setShowAddClient(true)}>{t('dashboard.addDebtor')}</Button>
       </div>
 
@@ -253,6 +262,17 @@ export function Dashboard() {
       </div>
 
       {loadError && <div style={{ marginBottom: 16 }}><ErrorBanner>{loadError}</ErrorBanner></div>}
+
+      <div style={{ position: 'relative', marginBottom: 14 }}>
+        <Search size={16} color="var(--color-text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+        <input
+          className="input"
+          placeholder={t('dashboard.searchPlaceholder') ?? ''}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ paddingLeft: 36 }}
+        />
+      </div>
 
       {/* Табы по статусам */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -300,7 +320,7 @@ export function Dashboard() {
 
       {!loading && !loadError && filteredSorted.length === 0 && (
         <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          {t('dashboard.noDebtors')}
+          {search.trim() ? t('dashboard.searchNoResults') : t('dashboard.noDebtors')}
         </div>
       )}
 

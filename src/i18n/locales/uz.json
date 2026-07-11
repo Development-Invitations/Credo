@@ -40,7 +40,9 @@
     "statusNoDebts": "Qarz yo'q",
     "tabAll": "Barcha qarzdorlar",
     "sortNewest": "Avval yangilari",
-    "sortOldest": "Avval eskilari"
+    "sortOldest": "Avval eskilari",
+    "searchPlaceholder": "Ism yoki telefon bo'yicha qidirish...",
+    "searchNoResults": "Hech kim topilmadi"
   },
   "debtorForm": {
     "title": "Yangi qarzdor",
@@ -88,7 +90,10 @@
     "theme_ocean": "Okean",
     "theme_forest": "O'rmon",
     "theme_sand": "Qum",
-    "changelogButton": "Yangilanishlar tarixi"
+    "changelogButton": "Yangilanishlar tarixi",
+    "soundToggle": "Bildirishnoma ovozi",
+    "callingToggle": "«Qo'ng'iroq qilish» tugmasi",
+    "callingHint": "Mijoz kartochkasida qo'ng'iroq tugmasini ko'rsatish. Agar kompyuterda telefoniya sozlangan bo'lsa (masalan, SIP dasturi yoki tel: havolalariga ulangan USB-modem), yoqing. Agar sozlanmagan bo'lsa — o'chirilgan holda qoldiring, faqat raqamni nusxalash mavjud bo'ladi."
   },
   "errors": {
     "generic": "Nimadir xato ketdi. Qayta urinib ko'ring.",
@@ -145,7 +150,9 @@
     "confirmDeleteDebt": "Bu qarz yozuvini o'chirasizmi?",
     "partialPayment": "Qisman to'lash",
     "partialPaymentAmount": "To'lov summasi",
-    "paidSoFar": "{{amount}} to'landi"
+    "paidSoFar": "{{amount}} to'landi",
+    "call": "Qo'ng'iroq qilish",
+    "copyPhone": "Raqamni nusxalash"
   },
   "report": {
     "title": "Hisobot",
@@ -166,7 +173,11 @@
     "reminderPending": "kutilmoqda",
     "currentlyOverdue": "Hozir muddati o'tgan",
     "paidLate": "Kechikib to'langan",
-    "onTime": "O'z vaqtida to'langan"
+    "onTime": "O'z vaqtida to'langan",
+    "exportCsv": "CSV'ga eksport",
+    "rangeAll": "Butun davr",
+    "rangeMonth": "Shu oy",
+    "range30days": "Oxirgi 30 kun"
   },
   "profile": {
     "title": "Shaxsiy kabinet",
@@ -199,5 +210,11 @@
     "serverTitle": "Ma'lumotlar serveri mavjud emas",
     "serverText": "Internet bor, lekin Credo serveriga ulanib bo'lmayapti — ehtimol vaqtinchalik texnik ishlar. Biroz kuting, ilova aloqani o'zi tekshiradi.",
     "retrying": "Aloqa tekshirilmoqda..."
+  },
+  "help": {
+    "dashboard": "Bu yerda barcha mijozlar ro'yxati. Yuqoridagi tablar holat bo'yicha filtrlaydi, o'ngdagi tugma yaratilgan sana bo'yicha saralaydi. Mijozga bosish uning qarzlari tarixini ochadi. Qo'ng'iroq belgisi — eslatmalar, savat — arxivga yuborish.",
+    "clientDetail": "Bu yerda mijozning barcha qarzlari tarixi. Yangi qarzni yuqoridagi tugma bilan qo'shing, to'landi deb belgilang yoki tanga belgisi bilan qisman to'lov kiriting. Hech narsa o'chirilmaydi — butun tarix hisobot uchun saqlanadi.",
+    "archive": "Arxivdagi mijozlar bosh sahifada ko'rinmaydi va bildirishnomalarga tushmaydi. Ularning qarz tarixi saqlanadi — bosish uni ko'rish rejimida ochadi. Yangi qarz qo'shish uchun mijozni tiklang.",
+    "report": "Barcha mijozlar bo'yicha umumiy statistika va har biri bo'yicha batafsil tarix: summalar, to'lov sanalari, muddati o'tganmi. Yuqoridagi filtr grafik va hisoblagichlar davrini o'zgartiradi, \"Eksport\" tugmasi barcha qarzlar ro'yxatini CSV faylga saqlaydi."
   }
 }
