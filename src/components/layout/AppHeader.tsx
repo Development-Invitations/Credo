@@ -14,7 +14,7 @@ interface Props {
 export function AppHeader({ userName, onOpenSettings }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { notificationsCount } = useUI();
+  const { notificationsCount, hasUnseenUpdate } = useUI();
   const [notifOpen, setNotifOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -86,6 +86,20 @@ export function AppHeader({ userName, onOpenSettings }: Props) {
 
         <IconButton title={t('header.settings')} onClick={onOpenSettings}>
           <SettingsIcon size={19} />
+          {hasUnseenUpdate && (
+            <span
+              style={{
+                position: 'absolute',
+                top: 4,
+                right: 4,
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: 'var(--color-accent)',
+                animation: 'pulse-dot 1.6s ease-in-out infinite',
+              }}
+            />
+          )}
         </IconButton>
 
         <IconButton
@@ -108,6 +122,10 @@ export function AppHeader({ userName, onOpenSettings }: Props) {
           15% { transform: rotate(-8deg); }
           20% { transform: rotate(6deg); }
           25% { transform: rotate(0deg); }
+        }
+        @keyframes pulse-dot {
+          0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent); }
+          50% { transform: scale(1.15); opacity: 0.85; box-shadow: 0 0 0 4px transparent; }
         }
       `}</style>
     </header>

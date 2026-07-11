@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2, RotateCcw, Coins } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useToast } from '../context/ToastContext';
 import { AmountInput } from './AmountInput';
 import { Button } from './Button';
 
@@ -25,6 +26,7 @@ interface Props {
 
 export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [showPartial, setShowPartial] = useState(false);
   const [partialAmount, setPartialAmount] = useState('');
 
@@ -63,7 +65,10 @@ export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
   async function handlePartialPayment(e: React.FormEvent) {
     e.preventDefault();
     const paid = Number(partialAmount) || 0;
-    if (paid <= 0) return;
+    if (paid <= 0) {
+      showToast(t('toast.enterAmount'), 'error');
+      return;
+    }
     const newPaidAmount = Math.min(Number(debt.paid_amount || 0) + paid, Number(debt.amount));
     const newStatus = newPaidAmount >= Number(debt.amount) ? 'paid' : 'active';
     await supabase.from('debts').update({ paid_amount: newPaidAmount, status: newStatus }).eq('id', debt.id);
@@ -96,13 +101,13 @@ export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
             {debt.comment ? ` — ${debt.comment}` : ''}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 2 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
           {!readOnly && debt.status === 'active' && (
-            <IconBtn onClick={() => setShowPartial((v) => !v)} title={t('clientDetail.partialPayment') ?? ''}>
+            <IconBtn onClick={() => setShowPartial((v) => !v)} title={t('clientDetail.partialPayment') ?? ''} active={showPartial}>
               <Coins size={16} />
             </IconBtn>
           )}
-          {!readOnly && (
+          {!readOnly && !showPartial && (
             <IconBtn
               onClick={debt.status === 'active' ? markFullyPaid : markActive}
               title={debt.status === 'active' ? t('clientDetail.markPaid') : t('clientDetail.markActive')}
@@ -130,16 +135,17 @@ export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
   );
 }
 
-function IconBtn({ children, onClick, title }: { children: React.ReactNode; onClick: () => void; title?: string }) {
+function IconBtn({ children, onClick, title, active }: { children: React.ReactNode; onClick: () => void; title?: string; active?: boolean }) {
   return (
     <button
       onClick={onClick}
       title={title}
       style={{
-        background: 'transparent',
+        background: active ? 'var(--color-accent)' : 'transparent',
         border: 'none',
+        borderRadius: 'var(--radius-sm)',
         cursor: 'pointer',
-        color: 'var(--color-text-muted)',
+        color: active ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
         padding: 6,
         display: 'flex',
       }}

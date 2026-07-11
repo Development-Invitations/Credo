@@ -36,7 +36,11 @@
     "viewReminders": "Eslatmalar",
     "errorMigrationMissing": "Ma'lumotlarni yuklab bo'lmadi — bazada yangi ustunlar yetishmayotganga o'xshaydi. Supabase'da ikkinchi SQL-migratsiyani (migration_002_archive_due_date.sql) bajaring.",
     "errorGeneric": "Ma'lumotlarni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.",
-    "errorDebtsTableMissing": "Qarzlar jadvali topilmadi — Supabase'da migration_003_debts_table.sql'ni bajaring."
+    "errorDebtsTableMissing": "Qarzlar jadvali topilmadi — Supabase'da migration_003_debts_table.sql'ni bajaring.",
+    "statusNoDebts": "Qarz yo'q",
+    "tabAll": "Barcha qarzdorlar",
+    "sortNewest": "Avval yangilari",
+    "sortOldest": "Avval eskilari"
   },
   "debtorForm": {
     "title": "Yangi qarzdor",
@@ -83,7 +87,8 @@
     "theme_light": "Yorug'",
     "theme_ocean": "Okean",
     "theme_forest": "O'rmon",
-    "theme_sand": "Qum"
+    "theme_sand": "Qum",
+    "changelogButton": "Yangilanishlar tarixi"
   },
   "errors": {
     "generic": "Nimadir xato ketdi. Qayta urinib ko'ring.",
@@ -115,7 +120,9 @@
     "empty": "Hozircha hammasi tinch — muddati o'tgan yoki eslatma yo'q",
     "overdueSince": "{{date}} dan beri muddati o'tgan",
     "reminderDue": "Eslatish vaqti keldi",
-    "refresh": "Hozir yangilash"
+    "refresh": "Hozir yangilash",
+    "updateAvailable": "v{{version}} yangilanishi mavjud",
+    "readWhatsNew": "Yangiliklar haqida o'qish"
   },
   "archive": {
     "empty": "Arxiv bo'sh",
@@ -170,5 +177,19 @@
   },
   "update": {
     "available": "Credo v{{version}} yangi versiyasi mavjud"
+  },
+  "changelog": {
+    "title": "Yangilanishlar tarixi",
+    "empty": "Hozircha yangilanishlar tarixi yo'q"
+  },
+  "toast": {
+    "enterAmount": "To'lov summasini kiriting"
+  },
+  "connectivity": {
+    "offlineTitle": "Internet aloqasi yo'q",
+    "offlineText": "Ushbu qurilmadagi internet aloqasini tekshiring. Aloqa tiklangach ilova avtomatik davom etadi — hech narsa bosish shart emas.",
+    "serverTitle": "Ma'lumotlar serveri mavjud emas",
+    "serverText": "Internet bor, lekin Credo serveriga ulanib bo'lmayapti — ehtimol vaqtinchalik texnik ishlar. Biroz kuting, ilova aloqani o'zi tekshiradi.",
+    "retrying": "Aloqa tekshirilmoqda..."
   }
 }

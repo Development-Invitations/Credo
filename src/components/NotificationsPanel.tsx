@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Clock, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Clock, RefreshCw, Sparkles } from 'lucide-react';
 import { useUI } from '../context/UIContext';
 
 interface Props {
@@ -9,9 +9,17 @@ interface Props {
 
 export function NotificationsPanel({ onClose }: Props) {
   const { t } = useTranslation();
-  const { overdueDebtors, dueReminders, requestOpenReminders, refreshNotifications } = useUI();
+  const {
+    overdueDebtors,
+    dueReminders,
+    requestOpenReminders,
+    refreshNotifications,
+    hasUnseenUpdate,
+    latestVersion,
+    requestChangelog,
+  } = useUI();
 
-  const isEmpty = overdueDebtors.length === 0 && dueReminders.length === 0;
+  const isEmpty = overdueDebtors.length === 0 && dueReminders.length === 0 && !hasUnseenUpdate;
 
   return (
     <div
@@ -44,6 +52,32 @@ export function NotificationsPanel({ onClose }: Props) {
       {isEmpty && (
         <div style={{ color: 'var(--color-text-muted)', fontSize: 13, textAlign: 'center', padding: '16px 0' }}>
           {t('notifications.empty')}
+        </div>
+      )}
+
+      {hasUnseenUpdate && latestVersion && (
+        <div
+          onClick={() => {
+            requestChangelog();
+            onClose();
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 6px',
+            borderRadius: 'var(--radius-sm)',
+            cursor: 'pointer',
+            background: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'color-mix(in srgb, var(--color-accent) 18%, transparent)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'color-mix(in srgb, var(--color-accent) 10%, transparent)')}
+        >
+          <Sparkles size={16} color="var(--color-accent)" style={{ flexShrink: 0 }} />
+          <div style={{ fontSize: 13 }}>
+            <div>{t('notifications.updateAvailable', { version: latestVersion.version })}</div>
+            <div style={{ color: 'var(--color-accent)', fontSize: 12 }}>{t('notifications.readWhatsNew')}</div>
+          </div>
         </div>
       )}
 

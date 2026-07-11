@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, X } from 'lucide-react';
-import { useAppVersion } from '../hooks/useAppVersion';
+import { useUI } from '../context/UIContext';
 
 export function UpdateBanner() {
   const { t } = useTranslation();
-  const { updateAvailable, latestVersion } = useAppVersion();
+  const { updateAvailable, latestVersion } = useUI();
   const [dismissedVersion, setDismissedVersion] = useState<string | null>(null);
 
   if (!updateAvailable || !latestVersion) return null;

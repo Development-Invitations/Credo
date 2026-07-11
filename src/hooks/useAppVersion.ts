@@ -13,7 +13,18 @@ interface LatestVersion {
   release_notes: string | null;
 }
 
-const CHECK_INTERVAL_MS = 5 * 60 * 1000; // проверяем раз в 5 минут, пока приложение открыто
+const CHECK_INTERVAL_MS = 5 * 60 * 1000;
+
+/** Сравнивает версии вида "0.1.10" по числам, а не как строки (иначе "0.1.9" > "0.1.10"). */
+function compareVersions(a: string, b: string): number {
+  const pa = a.split('.').map((n) => parseInt(n, 10) || 0);
+  const pb = b.split('.').map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] || 0) - (pb[i] || 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
 
 export function useAppVersion() {
   const [currentVersion, setCurrentVersion] = useState('0.1.0');
@@ -37,7 +48,10 @@ export function useAppVersion() {
     return () => clearInterval(interval);
   }, []);
 
-  const updateAvailable = !!latestVersion && latestVersion.version !== currentVersion;
+  // Баннер показываем, только если версия в базе РЕАЛЬНО новее текущей — а не просто "другая".
+  // Иначе, например, при локальной разработке (когда в package.json уже стоит будущая версия,
+  // а в базе ещё старая) баннер ошибочно предлагал бы "обновиться" на более старую версию.
+  const updateAvailable = !!latestVersion && compareVersions(latestVersion.version, currentVersion) > 0;
 
   return { currentVersion, latestVersion, updateAvailable };
 }

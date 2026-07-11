@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useUI } from '../context/UIContext';
 import { supabase } from '../lib/supabaseClient';
 import { SUPPORTED_LANGUAGES } from '../i18n';
 import { CURRENCIES } from '../lib/currency';
 import { THEMES } from '../lib/themes';
-import { useAppVersion } from '../hooks/useAppVersion';
+import { History } from 'lucide-react';
 import { Button } from './Button';
 import { SettingsRow } from './SettingsRow';
 import { ErrorBanner } from './ErrorBanner';
@@ -16,8 +17,37 @@ export function SettingsPanelContent() {
   const navigate = useNavigate();
   const { theme, setTheme, language, setLanguage, currency, setCurrency, suggestedCurrencyForLanguage } =
     useApp();
-  const { currentVersion, latestVersion, updateAvailable } = useAppVersion();
+  const {
+    currentVersion,
+    latestVersion,
+    updateAvailable,
+    hasUnseenUpdate,
+    markUpdateSeen,
+    changelogRequested,
+    clearChangelogRequest,
+  } = useUI();
   const [currencyPrompt, setCurrencyPrompt] = useState<{ lang: string; suggested: string } | null>(null);
+  const [showChangelog, setShowChangelog] = useState(false);
+  const [changelog, setChangelog] = useState<{ version: string; released_at: string; release_notes: string | null }[]>([]);
+
+  async function openChangelog() {
+    setShowChangelog(true);
+    markUpdateSeen();
+    const { data } = await supabase
+      .from('app_versions')
+      .select('version, released_at, release_notes')
+      .order('released_at', { ascending: false });
+    setChangelog(data ?? []);
+  }
+
+  // Если журнал запрошен кликом из колокольчика уведомлений — открываем сразу
+  useEffect(() => {
+    if (changelogRequested) {
+      openChangelog();
+      clearChangelogRequest();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [changelogRequested]);
 
   const languageLabel = SUPPORTED_LANGUAGES.find((l) => l.code === language)?.label ?? language;
   const themeLabel = t(`settings.theme_${theme}`);
@@ -130,7 +160,44 @@ export function SettingsPanelContent() {
             </Button>
           </div>
         )}
+        <button
+          onClick={openChangelog}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--color-text-muted)',
+            fontSize: 12,
+            cursor: 'pointer',
+            marginTop: 12,
+            padding: 0,
+            position: 'relative',
+          }}
+        >
+          <History size={14} />
+          {t('settings.changelogButton')}
+          {hasUnseenUpdate && (
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: 'var(--color-accent)',
+                animation: 'settings-pulse-dot 1.6s ease-in-out infinite',
+              }}
+            />
+          )}
+        </button>
       </div>
+
+      <style>{`
+        @keyframes settings-pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.3); }
+        }
+      `}</style>
 
       <Button
         variant="secondary"
@@ -167,6 +234,49 @@ export function SettingsPanelContent() {
               <Button onClick={() => { setCurrency(currencyPrompt.suggested); setLanguage(currencyPrompt.lang); setCurrencyPrompt(null); }}>
                 {t('settings.changeCurrency')}
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showChangelog && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 250,
+          }}
+          onClick={() => setShowChangelog(false)}
+        >
+          <div
+            className="card"
+            style={{ width: 420, maxHeight: '75vh', overflowY: 'auto', boxShadow: 'var(--shadow-elevated)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ marginBottom: 14 }}>{t('changelog.title')}</h3>
+            {changelog.length === 0 && (
+              <div style={{ color: 'var(--color-text-muted)', fontSize: 13, textAlign: 'center', padding: '12px 0' }}>
+                {t('changelog.empty')}
+              </div>
+            )}
+            <div style={{ display: 'grid', gap: 10 }}>
+              {changelog.map((v, i) => (
+                <div key={i} style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontWeight: 600, fontSize: 13 }}>v{v.version}</span>
+                    <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+                      {new Date(v.released_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  {v.release_notes && (
+                    <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{v.release_notes}</div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>

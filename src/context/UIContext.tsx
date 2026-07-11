@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { playNotificationSound } from '../lib/sound';
+import { useAppVersion } from '../hooks/useAppVersion';
 
 export interface OverdueDebtor {
   id: string; // id записи долга (для ключа списка)
@@ -29,6 +30,16 @@ interface UIContextValue {
   notificationsCount: number;
   refreshNotifications: () => void;
   notificationsError: string | null;
+
+  currentVersion: string;
+  latestVersion: { version: string; download_url: string; release_notes: string | null } | null;
+  updateAvailable: boolean;
+  hasUnseenUpdate: boolean;
+  markUpdateSeen: () => void;
+
+  changelogRequested: boolean;
+  requestChangelog: () => void;
+  clearChangelogRequest: () => void;
 }
 
 const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -43,6 +54,18 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
   const prevCountRef = useRef(0);
   const firstRunRef = useRef(true);
   const preciseTimerRef = useRef<number | null>(null);
+
+  const { currentVersion, latestVersion, updateAvailable } = useAppVersion();
+  const [lastSeenVersion, setLastSeenVersion] = useState<string | null>(localStorage.getItem('lastSeenVersion'));
+  const hasUnseenUpdate = updateAvailable && !!latestVersion && latestVersion.version !== lastSeenVersion;
+  const markUpdateSeen = useCallback(() => {
+    if (latestVersion) {
+      localStorage.setItem('lastSeenVersion', latestVersion.version);
+      setLastSeenVersion(latestVersion.version);
+    }
+  }, [latestVersion]);
+
+  const [changelogRequested, setChangelogRequested] = useState(false);
 
   const refreshNotifications = useCallback(async () => {
     const today = new Date().toISOString().slice(0, 10);
@@ -138,9 +161,17 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
         clearOpenReminders: () => setOpenRemindersDebtorId(null),
         overdueDebtors,
         dueReminders,
-        notificationsCount: overdueDebtors.length + dueReminders.length,
+        notificationsCount: overdueDebtors.length + dueReminders.length + (hasUnseenUpdate ? 1 : 0),
         refreshNotifications,
         notificationsError,
+        currentVersion,
+        latestVersion,
+        updateAvailable,
+        hasUnseenUpdate,
+        markUpdateSeen,
+        changelogRequested,
+        requestChangelog: () => setChangelogRequested(true),
+        clearChangelogRequest: () => setChangelogRequested(false),
       }}
     >
       {children}
