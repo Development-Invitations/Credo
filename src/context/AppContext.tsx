@@ -19,6 +19,12 @@ interface AppContextValue {
   suggestedCurrencyForLanguage: (lang: string) => string;
   creditModuleEnabled: boolean;
   setCreditModuleEnabled: (v: boolean) => void;
+  soundModuleEnabled: boolean;
+  setSoundModuleEnabled: (v: boolean) => void;
+  callingModuleEnabled: boolean;
+  setCallingModuleEnabled: (v: boolean) => void;
+  smsModuleEnabled: boolean;
+  setSmsModuleEnabled: (v: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -37,6 +43,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
   const [creditModuleEnabled, setCreditModuleEnabledState] = useState(
     localStorage.getItem('creditModuleEnabled') === 'true'
+  );
+  const [soundModuleEnabled, setSoundModuleEnabledState] = useState(
+    localStorage.getItem('soundEnabled') !== 'false'
+  );
+  const [callingModuleEnabled, setCallingModuleEnabledState] = useState(
+    localStorage.getItem('callingEnabled') === 'true'
+  );
+  const [smsModuleEnabled, setSmsModuleEnabledState] = useState(
+    localStorage.getItem('smsEnabled') === 'true'
   );
 
   // Восстановление сессии при запуске (авто-вход, если пользователь уже входил ранее)
@@ -81,6 +96,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setCreditModuleEnabled: (v: boolean) => {
           setCreditModuleEnabledState(v);
           localStorage.setItem('creditModuleEnabled', v ? 'true' : 'false');
+        },
+        soundModuleEnabled,
+        setSoundModuleEnabled: (v: boolean) => {
+          setSoundModuleEnabledState(v);
+          localStorage.setItem('soundEnabled', v ? 'true' : 'false');
+        },
+        callingModuleEnabled,
+        setCallingModuleEnabled: (v: boolean) => {
+          setCallingModuleEnabledState(v);
+          localStorage.setItem('callingEnabled', v ? 'true' : 'false');
+        },
+        smsModuleEnabled,
+        setSmsModuleEnabled: (v: boolean) => {
+          setSmsModuleEnabledState(v);
+          localStorage.setItem('smsEnabled', v ? 'true' : 'false');
         },
       }}
     >

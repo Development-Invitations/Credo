@@ -11,6 +11,7 @@ import { ClientDetailDrawer } from '../../components/ClientDetailDrawer';
 import { ErrorBanner } from '../../components/ErrorBanner';
 import { Pagination } from '../../components/Pagination';
 import { HelpTooltip } from '../../components/HelpTooltip';
+import { getExchangeRates, convertToBase } from '../../lib/exchangeRates';
 
 interface ClientRow {
   id: string;
@@ -77,6 +78,11 @@ export function Dashboard() {
   const [dateSort, setDateSort] = useState<DateSort>('newest');
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [rates, setRates] = useState<Record<string, number> | null>(null);
+
+  useEffect(() => {
+    getExchangeRates(currency).then(setRates);
+  }, [currency]);
 
   async function loadClients() {
     const { data: clientsData, error: clientsError } = await supabase
@@ -216,6 +222,25 @@ export function Dashboard() {
     return Object.entries(map).map(([currency, amount]) => ({ currency, amount }));
   }, [clients]);
 
+  const convertedTotal = useMemo(() => {
+    if (!rates || kpiTotalsByCurrency.length === 0) return null;
+    let sum = 0;
+    let anyConverted = false;
+    for (const s of kpiTotalsByCurrency) {
+      if (s.currency.toUpperCase() === currency.toUpperCase()) {
+        sum += s.amount;
+        anyConverted = true;
+      } else {
+        const converted = convertToBase(s.amount, s.currency, rates);
+        if (converted !== null) {
+          sum += converted;
+          anyConverted = true;
+        }
+      }
+    }
+    return anyConverted ? sum : null;
+  }, [kpiTotalsByCurrency, rates, currency]);
+
   const tabs: { key: StatusFilter; label: string; count: number }[] = [
     { key: 'all', label: t('dashboard.tabAll'), count: counts.all },
     { key: 'active', label: t('dashboard.statusActive'), count: counts.active },
@@ -225,7 +250,7 @@ export function Dashboard() {
   ];
 
   return (
-    <div style={{ maxWidth: 900, margin: '32px auto', padding: '0 24px 40px' }}>
+    <div style={{ maxWidth: 1120, margin: '32px auto', padding: '0 24px 40px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <h1>{t('dashboard.title')}</h1>
@@ -245,6 +270,11 @@ export function Dashboard() {
                 {s.amount.toLocaleString()} {s.currency}
               </div>
             ))
+          )}
+          {kpiTotalsByCurrency.length > 1 && convertedTotal !== null && (
+            <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>
+              ≈ {Math.round(convertedTotal).toLocaleString()} {currency} <HelpTooltip text={t('dashboard.convertedHint')} width={220} />
+            </div>
           )}
         </div>
         <div className="card">

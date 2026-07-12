@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { Users, Archive, BellRing, BarChart3, Landmark } from 'lucide-react';
+import { Users, Archive, BellRing, BarChart3, Landmark, Volume2, Phone, MessageSquare } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 const navItemStyle = (isActive: boolean): React.CSSProperties => ({
@@ -19,7 +19,7 @@ const navItemStyle = (isActive: boolean): React.CSSProperties => ({
 
 export function AppSidebar() {
   const { t } = useTranslation();
-  const { creditModuleEnabled } = useApp();
+  const { creditModuleEnabled, soundModuleEnabled, callingModuleEnabled, smsModuleEnabled } = useApp();
 
   return (
     <aside
@@ -46,6 +46,24 @@ export function AppSidebar() {
         <NavLink to="/credits" style={({ isActive }) => navItemStyle(isActive)}>
           <Landmark size={18} />
           {t('sidebar.credits')}
+        </NavLink>
+      )}
+      {soundModuleEnabled && (
+        <NavLink to="/sound" style={({ isActive }) => navItemStyle(isActive)}>
+          <Volume2 size={18} />
+          {t('sidebar.sound')}
+        </NavLink>
+      )}
+      {callingModuleEnabled && (
+        <NavLink to="/calling" style={({ isActive }) => navItemStyle(isActive)}>
+          <Phone size={18} />
+          {t('sidebar.calling')}
+        </NavLink>
+      )}
+      {smsModuleEnabled && (
+        <NavLink to="/sms" style={({ isActive }) => navItemStyle(isActive)}>
+          <MessageSquare size={18} />
+          {t('sidebar.sms')}
         </NavLink>
       )}
       <NavLink to="/archive" style={({ isActive }) => navItemStyle(isActive)}>

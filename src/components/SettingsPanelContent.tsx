@@ -9,16 +9,29 @@ import { CURRENCIES } from '../lib/currency';
 import { THEMES } from '../lib/themes';
 import { History, X } from 'lucide-react';
 import { Checkbox } from './Checkbox';
-import { isSoundEnabled } from '../lib/sound';
 import { Button } from './Button';
 import { SettingsRow } from './SettingsRow';
-import { ErrorBanner } from './ErrorBanner';
 
 export function SettingsPanelContent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { theme, setTheme, language, setLanguage, currency, setCurrency, suggestedCurrencyForLanguage, creditModuleEnabled, setCreditModuleEnabled } =
-    useApp();
+  const {
+    theme,
+    setTheme,
+    language,
+    setLanguage,
+    currency,
+    setCurrency,
+    suggestedCurrencyForLanguage,
+    creditModuleEnabled,
+    setCreditModuleEnabled,
+    soundModuleEnabled,
+    setSoundModuleEnabled,
+    callingModuleEnabled,
+    setCallingModuleEnabled,
+    smsModuleEnabled,
+    setSmsModuleEnabled,
+  } = useApp();
   const {
     currentVersion,
     latestVersion,
@@ -30,18 +43,6 @@ export function SettingsPanelContent() {
     startDownload,
   } = useUI();
   const [currencyPrompt, setCurrencyPrompt] = useState<{ lang: string; suggested: string } | null>(null);
-  const [soundOn, setSoundOn] = useState(isSoundEnabled());
-  const [callingOn, setCallingOn] = useState(localStorage.getItem('callingEnabled') === 'true');
-
-  function toggleSound(checked: boolean) {
-    setSoundOn(checked);
-    localStorage.setItem('soundEnabled', checked ? 'true' : 'false');
-  }
-
-  function toggleCalling(checked: boolean) {
-    setCallingOn(checked);
-    localStorage.setItem('callingEnabled', checked ? 'true' : 'false');
-  }
   const [showChangelog, setShowChangelog] = useState(false);
   const [changelog, setChangelog] = useState<{ version: string; released_at: string; release_notes: string | null }[]>([]);
 
@@ -55,7 +56,6 @@ export function SettingsPanelContent() {
     setChangelog(data ?? []);
   }
 
-  // Если журнал запрошен кликом из колокольчика уведомлений — открываем сразу
   useEffect(() => {
     if (changelogRequested) {
       openChangelog();
@@ -143,15 +143,7 @@ export function SettingsPanelContent() {
                 cursor: 'pointer',
               }}
             >
-              <span
-                style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: '50%',
-                  background: th.accent,
-                  display: 'block',
-                }}
-              />
+              <span style={{ width: 20, height: 20, borderRadius: '50%', background: th.accent, display: 'block' }} />
               <span style={{ fontSize: 11, color: th.id === 'light' || th.id === 'sand' ? '#333' : '#eee' }}>
                 {t(`settings.theme_${th.id}`)}
               </span>
@@ -160,6 +152,7 @@ export function SettingsPanelContent() {
         </div>
       </SettingsRow>
 
+      {/* Модули — активация тут, подробная настройка каждого вынесена отдельным пунктом в меню слева */}
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 14 }}>{t('settings.creditModuleToggle')}</span>
@@ -170,18 +163,33 @@ export function SettingsPanelContent() {
         </p>
       </div>
 
-      <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 14 }}>{t('settings.soundToggle')}</span>
-        <Checkbox checked={soundOn} onChange={toggleSound} />
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 14 }}>{t('settings.soundToggle')}</span>
+          <Checkbox checked={soundModuleEnabled} onChange={setSoundModuleEnabled} />
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8, lineHeight: 1.5 }}>
+          {t('settings.soundModuleHint')}
+        </p>
       </div>
 
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 14 }}>{t('settings.callingToggle')}</span>
-          <Checkbox checked={callingOn} onChange={toggleCalling} />
+          <Checkbox checked={callingModuleEnabled} onChange={setCallingModuleEnabled} />
         </div>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8, lineHeight: 1.5 }}>
           {t('settings.callingHint')}
+        </p>
+      </div>
+
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 14 }}>{t('settings.smsToggle')}</span>
+          <Checkbox checked={smsModuleEnabled} onChange={setSmsModuleEnabled} />
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8, lineHeight: 1.5 }}>
+          {t('settings.smsHint')}
         </p>
       </div>
 
@@ -326,13 +334,7 @@ export function SettingsPanelContent() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 13,
-                        color: i === 0 ? 'var(--color-accent)' : 'var(--color-text)',
-                      }}
-                    >
+                    <span style={{ fontWeight: 700, fontSize: 13, color: i === 0 ? 'var(--color-accent)' : 'var(--color-text)' }}>
                       v{v.version}
                       {i === 0 && (
                         <span

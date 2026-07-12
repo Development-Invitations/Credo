@@ -41,7 +41,7 @@ export function ArchivePage() {
   }
 
   return (
-    <div style={{ maxWidth: 860, margin: '32px auto', padding: '0 24px 40px' }}>
+    <div style={{ maxWidth: 1120, margin: '32px auto', padding: '0 24px 40px' }}>
       <h1 style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
         {t('sidebar.archive')}
         <HelpTooltip text={t('help.archive')} />

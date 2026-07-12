@@ -42,7 +42,8 @@
     "sortNewest": "Avval yangilari",
     "sortOldest": "Avval eskilari",
     "searchPlaceholder": "Ism yoki telefon bo'yicha qidirish...",
-    "searchNoResults": "Hech kim topilmadi"
+    "searchNoResults": "Hech kim topilmadi",
+    "convertedHint": "Bugungi kurs bo'yicha taxminiy summa — mo'ljal uchun, aniq hisob-kitob uchun emas."
   },
   "debtorForm": {
     "title": "Yangi qarzdor",
@@ -95,7 +96,43 @@
     "callingToggle": "«Qo'ng'iroq qilish» tugmasi",
     "callingHint": "Mijoz kartochkasida qo'ng'iroq tugmasini ko'rsatish. Agar kompyuterda telefoniya sozlangan bo'lsa (masalan, SIP dasturi yoki tel: havolalariga ulangan USB-modem), yoqing. Agar sozlanmagan bo'lsa — o'chirilgan holda qoldiring, faqat raqamni nusxalash mavjud bo'ladi.",
     "creditModuleToggle": "«Kreditlar» moduli",
-    "creditModuleHint": "Foizli (yoki foizsiz) kredit rasmiylashtirish va sanalar bo'yicha to'lov grafigini yuritish uchun yoqing — oddiy qarzlardan alohida. Standart holatda o'chirilgan."
+    "creditModuleHint": "Foizli (yoki foizsiz) kredit rasmiylashtirish va sanalar bo'yicha to'lov grafigini yuritish uchun yoqing — oddiy qarzlardan alohida. Standart holatda o'chirilgan.",
+    "soundVolume": "Ovoz balandligi",
+    "soundTest": "Ovozni tekshirish",
+    "callingApiUrl": "Telefoniya API manzili",
+    "callingApiKey": "API kaliti",
+    "callingApiHint": "Haqiqiy qo'ng'iroq xizmatini (SIP-provayder va h.k.) ulaganingizda to'ldiring — hozircha bu shunchaki sozlamalarni saqlash joyi, so'rov yuborish hali yo'q.",
+    "smsToggle": "SMS-xabarnoma moduli",
+    "smsHint": "Qarzlar va kreditlar bo'yicha avtomatik SMS sozlash uchun yoqing. Haqiqiy yuborish tanlangan provayder ulangandan keyin ishlaydi.",
+    "smsProvider": "SMS provayderi",
+    "smsProviderOther": "Boshqa (o'zim kiritaman)",
+    "smsDestination": "Qayerga yuborish",
+    "smsDestPhone": "Telefonga",
+    "smsDestEmail": "Pochtaga",
+    "smsTemplate": "Xabar shabloni",
+    "smsTemplateHint": "Mavjud o'zgaruvchilar: {{name}}, {{amount}}, {{date}}",
+    "smsNotConnected": "Provayder hali ulanmagan — yuborish hozircha mavjud emas, bu faqat kelajak uchun sozlama.",
+    "soundModuleHint": "Muddati o'tganda va eslatmalarda ovozli signal olish uchun yoqing. Batafsil sozlamalar — balandlik, tovush, qaysi hodisalarda — chapdagi menyudagi «Ovoz» bo'limida.",
+    "soundToneLabel": "Ovoz tovushi",
+    "soundTone_chime": "Klassik",
+    "soundTone_soft": "Yumshoq",
+    "soundTone_alert": "Ogohlantiruvchi",
+    "soundEventsLabel": "Hodisalar bo'yicha ovoz",
+    "soundOnOverdue": "Qarz yoki kredit muddati o'tganda",
+    "soundOnReminders": "Eslatma vaqti kelganda",
+    "soundOnUpdate": "Yangi versiya chiqqanda",
+    "callingCallerId": "Qo'ng'iroq qilinadigan raqam",
+    "smsRecommended": "(tavsiya etamiz — oddiy va arzon)",
+    "smsSenderPhone": "Jo'natuvchi raqami",
+    "smsLogin": "Provayder login / Email",
+    "smsPassword": "Parol / Token",
+    "smsTemplateDebt": "Qarzlar uchun shablon",
+    "smsTemplateCredit": "Kreditlar uchun shablon",
+    "emailSmtpHost": "SMTP-server",
+    "emailSmtpPort": "Port",
+    "emailLogin": "Login / Email",
+    "emailPassword": "Parol",
+    "emailFromName": "Jo'natuvchi nomi"
   },
   "errors": {
     "generic": "Nimadir xato ketdi. Qayta urinib ko'ring.",
@@ -107,7 +144,12 @@
     "networkError": "Server bilan aloqa yo'q. Internetni tekshiring.",
     "sessionExpired": "Sessiya tugadi. Qayta kiring.",
     "emailRateLimit": "Juda ko'p xat yuborildi. Keyinroq urinib ko'ring yoki loyihada email tasdiqlashni o'chiring.",
-    "emailNotConfirmedGeneric": "Email hali tasdiqlanmagan — pochtangizni tekshiring."
+    "emailNotConfirmedGeneric": "Email hali tasdiqlanmagan — pochtangizni tekshiring.",
+    "networkChangedFriendly": "Yuklab olish paytida internet aloqasi uzildi. Aloqani tekshirib, «Qayta urinish»ni bosing.",
+    "notFoundFriendly": "Yangilanish fayli serverda topilmadi. Buni jurnalga yozib qo'ydik — keyinroq urinib ko'ring.",
+    "timeoutFriendly": "Server uzoq vaqt javob bermayapti. Internetni tekshirib, qayta urinib ko'ring.",
+    "dnsFriendly": "Yangilanish serverini topib bo'lmadi. Internet aloqasini tekshiring.",
+    "genericFriendly": "Yuklab olishda xatolik yuz berdi. Tafsilotlarni yozib qo'ydik — biroz vaqtdan so'ng qayta urinib ko'ring."
   },
   "header": {
     "greeting": "Assalomu alaykum",
@@ -121,7 +163,10 @@
     "reminders": "Eslatmalar",
     "archive": "Arxiv",
     "report": "Hisobot",
-    "credits": "Kreditlar"
+    "credits": "Kreditlar",
+    "sound": "Ovoz",
+    "calling": "Telefoniya",
+    "sms": "SMS-xabarnoma"
   },
   "notifications": {
     "title": "Bildirishnomalar",
@@ -180,7 +225,9 @@
     "exportCsv": "CSV'ga eksport",
     "rangeAll": "Butun davr",
     "rangeMonth": "Shu oy",
-    "range30days": "Oxirgi 30 kun"
+    "range30days": "Oxirgi 30 kun",
+    "tabDebts": "Qarzlar",
+    "tabCredits": "Kreditlar"
   },
   "profile": {
     "title": "Shaxsiy kabinet",
@@ -197,7 +244,10 @@
     "later": "Keyinroq",
     "restartNow": "Hozir qayta ishga tushirish",
     "errorTitle": "Yangilanishni yuklab bo'lmadi",
-    "errorText": "Internet aloqasini tekshiring va keyinroq qayta urinib ko'ring."
+    "errorText": "Internet aloqasini tekshiring va keyinroq qayta urinib ko'ring.",
+    "retry": "Qayta urinish",
+    "updatingTo": "v{{version}} versiyasiga yangilanmoqda",
+    "whatsNew": "v{{version}}da nima yangi"
   },
   "changelog": {
     "title": "Yangilanishlar tarixi",
@@ -219,7 +269,10 @@
     "clientDetail": "Bu yerda mijozning barcha qarzlari tarixi. Yangi qarzni yuqoridagi tugma bilan qo'shing, to'landi deb belgilang yoki tanga belgisi bilan qisman to'lov kiriting. Hech narsa o'chirilmaydi — butun tarix hisobot uchun saqlanadi.",
     "archive": "Arxivdagi mijozlar bosh sahifada ko'rinmaydi va bildirishnomalarga tushmaydi. Ularning qarz tarixi saqlanadi — bosish uni ko'rish rejimida ochadi. Yangi qarz qo'shish uchun mijozni tiklang.",
     "report": "Barcha mijozlar bo'yicha umumiy statistika va har biri bo'yicha batafsil tarix: summalar, to'lov sanalari, muddati o'tganmi. Yuqoridagi filtr grafik va hisoblagichlar davrini o'zgartiradi, \"Eksport\" tugmasi barcha qarzlar ro'yxatini CSV faylga saqlaydi.",
-    "credits": "Bu yerda barcha rasmiylashtirilgan kreditlar. Mijozga bosish sanalar bo'yicha to'lov grafigini ochadi — to'lovga bosish uni tasdiqlangan deb belgilaydi (yoki belgini olib tashlaydi). Pastda — shu kredit bo'yicha barcha amallar jurnali."
+    "credits": "Bu yerda barcha rasmiylashtirilgan kreditlar. Mijozga bosish sanalar bo'yicha to'lov grafigini ochadi — to'lovga bosish uni tasdiqlangan deb belgilaydi (yoki belgini olib tashlaydi). Pastda — shu kredit bo'yicha barcha amallar jurnali.",
+    "sound": "Ovoz balandligi, tovushi va qaysi hodisalarda ishlashini sozlang — muddati o'tganda, eslatmalarda, yangi versiyalarda.",
+    "calling": "Haqiqiy qo'ng'iroq xizmatini (SIP-provayder va h.k.) ulash uchun sozlamalar. Hozircha bu shunchaki forma — qo'ng'iroq yuborish provayder ulangandan keyin ishlaydi.",
+    "sms": "Qarzlar va kreditlar uchun alohida shablonlar bilan SMS yoki pochta orqali eslatma yuborishni sozlang. Haqiqiy yuborish provayder ulangandan keyin ishlaydi."
   },
   "credit": {
     "createButton": "Kredit rasmiylashtirish",
@@ -244,6 +297,19 @@
     "noCredits": "Hozircha bironta kredit rasmiylashtirilmagan",
     "scheduleTitle": "To'lov grafigi",
     "eventsTitle": "Amallar jurnali",
-    "months": "oy"
+    "months": "oy",
+    "payNext": "To'lash ({{count}})",
+    "earlyRepayment": "Muddatidan oldin to'lash",
+    "undoLast": "Oxirgisini bekor qilish",
+    "periodLabel": "Davr (to'lovlar):",
+    "confirmPayTitle": "To'lovni tasdiqlang",
+    "confirmUndoTitle": "To'lov bekor qilinsinmi?",
+    "confirmPayText": "To'langan deb belgilanadigan to'lovlar soni: {{count}}",
+    "confirmUndoText": "{{date}} sanasidagi {{amount}} {{currency}} to'lov yana to'lanmagan holatga qaytadi.",
+    "confirmEarlyText": "Kredit bo'yicha qolgan barcha to'lovlar bir yo'la to'langan deb belgilanadi:",
+    "confirmActionButton": "Tasdiqlash",
+    "totalLabel": "Jami",
+    "eventPaidBatch": "To'landi: {{count}} ta to'lov, {{amount}} {{currency}}",
+    "eventEarlyRepayment": "Muddatidan oldin to'lov: {{count}} ta, {{amount}} {{currency}}"
   }
 }

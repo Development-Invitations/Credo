@@ -14,8 +14,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ToastProvider>
         <AppProvider>
           <App />
+          <ConnectivityGuard />
         </AppProvider>
-        <ConnectivityGuard />
       </ToastProvider>
     </ErrorBoundary>
   </React.StrictMode>

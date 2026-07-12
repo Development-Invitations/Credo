@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WifiOff, ServerCrash } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useApp } from '../context/AppContext';
 
 type Status = 'ok' | 'offline' | 'server';
 
@@ -10,11 +11,20 @@ const UNHEALTHY_INTERVAL_MS = 5000;
 
 export function ConnectivityGuard() {
   const { t } = useTranslation();
+  const { session } = useApp();
   const [status, setStatus] = useState<Status>('ok');
 
   const check = useCallback(async () => {
     if (!navigator.onLine) {
       setStatus('offline');
+      return;
+    }
+    // Без активной сессии не дёргаем Supabase лишний раз — supabase-js всё равно
+    // попытается освежить токен при каждом запросе, а если сохранённая сессия битая
+    // (например после долгого простоя или множества тестовых входов), это упирается
+    // в лимит Supabase на обновление токена и крутится по кругу без остановки.
+    if (!session) {
+      setStatus('ok');
       return;
     }
     try {
@@ -24,7 +34,7 @@ export function ConnectivityGuard() {
     } catch {
       setStatus('server');
     }
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     check();

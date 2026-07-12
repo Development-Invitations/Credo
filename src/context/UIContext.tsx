@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { playNotificationSound } from '../lib/sound';
+import { playNotificationSound, isSoundEnabledFor } from '../lib/sound';
 import { useAppVersion } from '../hooks/useAppVersion';
 
 export interface OverdueDebtor {
@@ -58,7 +58,8 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
   const [overdueDebtors, setOverdueDebtors] = useState<OverdueDebtor[]>([]);
   const [dueReminders, setDueReminders] = useState<DueReminder[]>([]);
   const [notificationsError, setNotificationsError] = useState<string | null>(null);
-  const prevCountRef = useRef(0);
+  const prevOverdueCountRef = useRef(0);
+  const prevReminderCountRef = useRef(0);
   const firstRunRef = useRef(true);
   const preciseTimerRef = useRef<number | null>(null);
 
@@ -71,6 +72,15 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
       setLastSeenVersion(latestVersion.version);
     }
   }, [latestVersion]);
+
+  const updateSoundFiredRef = useRef(false);
+  useEffect(() => {
+    if (hasUnseenUpdate && !updateSoundFiredRef.current && isSoundEnabledFor('update')) {
+      playNotificationSound('soft');
+      updateSoundFiredRef.current = true;
+    }
+    if (!hasUnseenUpdate) updateSoundFiredRef.current = false;
+  }, [hasUnseenUpdate]);
 
   const [changelogRequested, setChangelogRequested] = useState(false);
 
@@ -124,6 +134,14 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
       .lt('due_date', today)
       .is('debtors.archived_at', null);
 
+    // Просроченные платежи по кредитам (модуль включается отдельно, но таблица не мешает,
+    // если её ещё нет — просто вернётся ошибка, которую мы тихо игнорируем ниже)
+    const { data: overdueCreditPayments } = await supabase
+      .from('credit_payments')
+      .select('id, debtor_id, expected_amount, due_date, is_confirmed, credits!inner(currency, debtors!inner(full_name, archived_at))')
+      .eq('is_confirmed', false)
+      .lt('due_date', today);
+
     const { data: reminders, error: remindersError } = await supabase
       .from('reminders')
       .select('id, debtor_id, remind_at, message, debtors(full_name)')
@@ -162,7 +180,19 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
         currency: d.currency,
         due_date: d.due_date,
       }))
-      .filter((d) => d.amount > 0);
+      .filter((d) => d.amount > 0)
+      .concat(
+        (overdueCreditPayments ?? [])
+          .filter((p: any) => !p.credits?.debtors?.archived_at)
+          .map((p: any) => ({
+            id: p.id,
+            debtorId: p.debtor_id,
+            full_name: p.credits?.debtors?.full_name ?? '',
+            amount: Number(p.expected_amount),
+            currency: p.credits?.currency ?? '',
+            due_date: p.due_date,
+          }))
+      );
 
     const reminderList = (reminders ?? []).map((r: any) => ({
       id: r.id,
@@ -176,11 +206,13 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     setDueReminders(reminderList);
 
     const newCount = overdueList.length + reminderList.length;
-    if (!firstRunRef.current && newCount > prevCountRef.current) {
-      playNotificationSound();
+    if (!firstRunRef.current) {
+      if (overdueList.length > prevOverdueCountRef.current && isSoundEnabledFor('overdue')) playNotificationSound('alert');
+      else if (reminderList.length > prevReminderCountRef.current && isSoundEnabledFor('reminders')) playNotificationSound('chime');
     }
     firstRunRef.current = false;
-    prevCountRef.current = newCount;
+    prevOverdueCountRef.current = overdueList.length;
+    prevReminderCountRef.current = reminderList.length;
 
     if (preciseTimerRef.current) window.clearTimeout(preciseTimerRef.current);
     if (nextUpcoming?.remind_at) {

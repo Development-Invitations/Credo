@@ -14,6 +14,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     // eslint-disable-next-line no-console
     console.error('Необработанная ошибка приложения:', error, info.componentStack);
+    import('../lib/errorLog').then(({ logError }) => logError('react_crash', error)).catch(() => {});
   }
 
   render() {

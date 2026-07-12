@@ -72,7 +72,7 @@ export function ProfilePage() {
     .toUpperCase();
 
   return (
-    <div style={{ maxWidth: 640, margin: '32px auto', padding: '0 24px 40px' }}>
+    <div style={{ maxWidth: 1120, margin: '32px auto', padding: '0 24px 40px' }}>
       <h1 style={{ marginBottom: 24 }}>{t('profile.title')}</h1>
 
       <div className="card" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>

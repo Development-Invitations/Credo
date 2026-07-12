@@ -10,6 +10,9 @@ import { RemindersPage } from './pages/Reminders/RemindersPage';
 import { ReportsPage } from './pages/Reports/ReportsPage';
 import { ProfilePage } from './pages/Profile/ProfilePage';
 import { CreditsPage } from './pages/Credits/CreditsPage';
+import { SoundSettingsPage } from './pages/Sound/SoundSettingsPage';
+import { CallingSettingsPage } from './pages/Calling/CallingSettingsPage';
+import { SmsSettingsPage } from './pages/Sms/SmsSettingsPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { getRememberedEmail } from './lib/session';
 
@@ -90,6 +93,30 @@ export default function App() {
           element={
             <PrivateRoute>
               <CreditsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/sound"
+          element={
+            <PrivateRoute>
+              <SoundSettingsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/calling"
+          element={
+            <PrivateRoute>
+              <CallingSettingsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/sms"
+          element={
+            <PrivateRoute>
+              <SmsSettingsPage />
             </PrivateRoute>
           }
         />

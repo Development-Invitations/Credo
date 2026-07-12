@@ -33,7 +33,7 @@ export function RemindersPage() {
   }, []);
 
   return (
-    <div style={{ maxWidth: 860, margin: '32px auto', padding: '0 24px 40px' }}>
+    <div style={{ maxWidth: 1120, margin: '32px auto', padding: '0 24px 40px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1>{t('sidebar.reminders')}</h1>
         <button

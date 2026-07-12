@@ -63,11 +63,14 @@ export function CreateCreditModal({ debtorId, defaultCurrency, onClose, onCreate
       return;
     }
 
+    const accountNumber = `CR-${Date.now().toString(36).toUpperCase()}`;
+
     const { data: credit, error: creditError } = await supabase
       .from('credits')
       .insert({
         debtor_id: debtorId,
         user_id: user.id,
+        account_number: accountNumber,
         principal_amount: p,
         currency,
         interest_type: interestType,
