@@ -17,7 +17,7 @@ import { ErrorBanner } from './ErrorBanner';
 export function SettingsPanelContent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { theme, setTheme, language, setLanguage, currency, setCurrency, suggestedCurrencyForLanguage } =
+  const { theme, setTheme, language, setLanguage, currency, setCurrency, suggestedCurrencyForLanguage, creditModuleEnabled, setCreditModuleEnabled } =
     useApp();
   const {
     currentVersion,
@@ -159,6 +159,16 @@ export function SettingsPanelContent() {
           ))}
         </div>
       </SettingsRow>
+
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 14 }}>{t('settings.creditModuleToggle')}</span>
+          <Checkbox checked={creditModuleEnabled} onChange={setCreditModuleEnabled} />
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8, lineHeight: 1.5 }}>
+          {t('settings.creditModuleHint')}
+        </p>
+      </div>
 
       <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 14 }}>{t('settings.soundToggle')}</span>

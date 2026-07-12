@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { Users, Archive, BellRing, BarChart3 } from 'lucide-react';
+import { Users, Archive, BellRing, BarChart3, Landmark } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
 const navItemStyle = (isActive: boolean): React.CSSProperties => ({
   display: 'flex',
@@ -18,6 +19,7 @@ const navItemStyle = (isActive: boolean): React.CSSProperties => ({
 
 export function AppSidebar() {
   const { t } = useTranslation();
+  const { creditModuleEnabled } = useApp();
 
   return (
     <aside
@@ -40,6 +42,12 @@ export function AppSidebar() {
         <BellRing size={18} />
         {t('sidebar.reminders')}
       </NavLink>
+      {creditModuleEnabled && (
+        <NavLink to="/credits" style={({ isActive }) => navItemStyle(isActive)}>
+          <Landmark size={18} />
+          {t('sidebar.credits')}
+        </NavLink>
+      )}
       <NavLink to="/archive" style={({ isActive }) => navItemStyle(isActive)}>
         <Archive size={18} />
         {t('sidebar.archive')}

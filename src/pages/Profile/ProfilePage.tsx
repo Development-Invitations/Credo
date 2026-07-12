@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Mail, Calendar, Users, Wallet } from 'lucide-react';
+import { User, Mail, Calendar, Users, Wallet, Landmark } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import { useApp } from '../../context/AppContext';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 
 export function ProfilePage() {
   const { t } = useTranslation();
+  const { creditModuleEnabled } = useApp();
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [clientsCount, setClientsCount] = useState(0);
   const [debtsCount, setDebtsCount] = useState(0);
+  const [creditsCount, setCreditsCount] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -34,6 +37,9 @@ export function ProfilePage() {
 
       const { count: dCount } = await supabase.from('debts').select('id', { count: 'exact', head: true });
       setDebtsCount(dCount ?? 0);
+
+      const { count: crCount } = await supabase.from('credits').select('id', { count: 'exact', head: true });
+      setCreditsCount(crCount ?? 0);
 
       setLoading(false);
     }
@@ -128,6 +134,15 @@ export function ProfilePage() {
             <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{t('report.totalDebts')}</div>
           </div>
         </div>
+        {creditModuleEnabled && (
+          <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Landmark size={20} color="var(--color-accent)" />
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{loading ? '…' : creditsCount}</div>
+              <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{t('sidebar.credits')}</div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

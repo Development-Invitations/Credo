@@ -80,7 +80,7 @@ export function Drawer({ open, onClose, title, children }: Props) {
             <X size={20} />
           </button>
         </div>
-        <div style={{ padding: 20, overflowY: 'auto', flex: 1 }}>{children}</div>
+        <div style={{ padding: 20, overflowY: 'auto', overflowX: 'hidden', flex: 1 }}>{children}</div>
       </div>
     </div>
   );

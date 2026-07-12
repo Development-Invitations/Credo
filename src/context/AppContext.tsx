@@ -17,6 +17,8 @@ interface AppContextValue {
   setCurrency: (c: string) => void;
   /** Валюта, которую подразумевает текущий выбранный язык (для подсказки в UI) */
   suggestedCurrencyForLanguage: (lang: string) => string;
+  creditModuleEnabled: boolean;
+  setCreditModuleEnabled: (v: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -32,6 +34,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
   const [currency, setCurrencyState] = useState(
     localStorage.getItem('currency') || LANGUAGE_CURRENCY[localStorage.getItem('language') || 'ru']
+  );
+  const [creditModuleEnabled, setCreditModuleEnabledState] = useState(
+    localStorage.getItem('creditModuleEnabled') === 'true'
   );
 
   // Восстановление сессии при запуске (авто-вход, если пользователь уже входил ранее)
@@ -72,6 +77,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         currency,
         setCurrency: setCurrencyState,
         suggestedCurrencyForLanguage: (lang: string) => LANGUAGE_CURRENCY[lang] ?? 'USD',
+        creditModuleEnabled,
+        setCreditModuleEnabled: (v: boolean) => {
+          setCreditModuleEnabledState(v);
+          localStorage.setItem('creditModuleEnabled', v ? 'true' : 'false');
+        },
       }}
     >
       {children}

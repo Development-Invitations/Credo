@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, BellRing, Phone, Copy } from 'lucide-react';
+import { Plus, BellRing, Phone, Copy, Landmark } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { Drawer } from './Drawer';
 import { Button } from './Button';
 import { DebtItem, DebtRow } from './DebtItem';
 import { AddDebtModal } from './AddDebtModal';
+import { CreateCreditModal } from './CreateCreditModal';
 import { RemindersModal } from './RemindersModal';
 import { HelpTooltip } from './HelpTooltip';
+import { useApp } from '../context/AppContext';
 
 interface Props {
   clientId: string;
@@ -21,9 +23,11 @@ interface Props {
 
 export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultCurrency, readOnly, onClose, onDebtsChanged }: Props) {
   const { t } = useTranslation();
+  const { creditModuleEnabled } = useApp();
   const [debts, setDebts] = useState<DebtRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDebt, setShowAddDebt] = useState(false);
+  const [showCreateCredit, setShowCreateCredit] = useState(false);
   const [showReminders, setShowReminders] = useState(false);
   const callingEnabled = localStorage.getItem('callingEnabled') === 'true';
 
@@ -106,11 +110,21 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
       )}
 
       {!readOnly && (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
           <Button onClick={() => setShowAddDebt(true)} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <Plus size={16} />
             {t('clientDetail.addDebt')}
           </Button>
+          {creditModuleEnabled && (
+            <Button
+              variant="secondary"
+              onClick={() => setShowCreateCredit(true)}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+            >
+              <Landmark size={16} />
+              {t('credit.createButton')}
+            </Button>
+          )}
           <Button variant="secondary" onClick={() => setShowReminders(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <BellRing size={16} />
           </Button>
@@ -119,7 +133,7 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
 
       <h3 style={{ fontSize: 14, marginBottom: 10, color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
         {t('clientDetail.debtsHistory')}
-        <HelpTooltip text={t('help.clientDetail')} />
+        <HelpTooltip text={t('help.clientDetail')} width={220} />
       </h3>
 
       {!loading && debts.length === 0 && (
@@ -140,6 +154,15 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
           defaultCurrency={defaultCurrency}
           onClose={() => setShowAddDebt(false)}
           onCreated={load}
+        />
+      )}
+
+      {showCreateCredit && (
+        <CreateCreditModal
+          debtorId={clientId}
+          defaultCurrency={defaultCurrency}
+          onClose={() => setShowCreateCredit(false)}
+          onCreated={() => {}}
         />
       )}
 

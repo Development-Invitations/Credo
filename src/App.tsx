@@ -9,6 +9,7 @@ import { ArchivePage } from './pages/Archive/ArchivePage';
 import { RemindersPage } from './pages/Reminders/RemindersPage';
 import { ReportsPage } from './pages/Reports/ReportsPage';
 import { ProfilePage } from './pages/Profile/ProfilePage';
+import { CreditsPage } from './pages/Credits/CreditsPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { getRememberedEmail } from './lib/session';
 
@@ -81,6 +82,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/credits"
+          element={
+            <PrivateRoute>
+              <CreditsPage />
             </PrivateRoute>
           }
         />

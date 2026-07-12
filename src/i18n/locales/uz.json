@@ -93,7 +93,9 @@
     "changelogButton": "Yangilanishlar tarixi",
     "soundToggle": "Bildirishnoma ovozi",
     "callingToggle": "«Qo'ng'iroq qilish» tugmasi",
-    "callingHint": "Mijoz kartochkasida qo'ng'iroq tugmasini ko'rsatish. Agar kompyuterda telefoniya sozlangan bo'lsa (masalan, SIP dasturi yoki tel: havolalariga ulangan USB-modem), yoqing. Agar sozlanmagan bo'lsa — o'chirilgan holda qoldiring, faqat raqamni nusxalash mavjud bo'ladi."
+    "callingHint": "Mijoz kartochkasida qo'ng'iroq tugmasini ko'rsatish. Agar kompyuterda telefoniya sozlangan bo'lsa (masalan, SIP dasturi yoki tel: havolalariga ulangan USB-modem), yoqing. Agar sozlanmagan bo'lsa — o'chirilgan holda qoldiring, faqat raqamni nusxalash mavjud bo'ladi.",
+    "creditModuleToggle": "«Kreditlar» moduli",
+    "creditModuleHint": "Foizli (yoki foizsiz) kredit rasmiylashtirish va sanalar bo'yicha to'lov grafigini yuritish uchun yoqing — oddiy qarzlardan alohida. Standart holatda o'chirilgan."
   },
   "errors": {
     "generic": "Nimadir xato ketdi. Qayta urinib ko'ring.",
@@ -118,7 +120,8 @@
     "debtors": "Qarzdorlar",
     "reminders": "Eslatmalar",
     "archive": "Arxiv",
-    "report": "Hisobot"
+    "report": "Hisobot",
+    "credits": "Kreditlar"
   },
   "notifications": {
     "title": "Bildirishnomalar",
@@ -215,6 +218,32 @@
     "dashboard": "Bu yerda barcha mijozlar ro'yxati. Yuqoridagi tablar holat bo'yicha filtrlaydi, o'ngdagi tugma yaratilgan sana bo'yicha saralaydi. Mijozga bosish uning qarzlari tarixini ochadi. Qo'ng'iroq belgisi — eslatmalar, savat — arxivga yuborish.",
     "clientDetail": "Bu yerda mijozning barcha qarzlari tarixi. Yangi qarzni yuqoridagi tugma bilan qo'shing, to'landi deb belgilang yoki tanga belgisi bilan qisman to'lov kiriting. Hech narsa o'chirilmaydi — butun tarix hisobot uchun saqlanadi.",
     "archive": "Arxivdagi mijozlar bosh sahifada ko'rinmaydi va bildirishnomalarga tushmaydi. Ularning qarz tarixi saqlanadi — bosish uni ko'rish rejimida ochadi. Yangi qarz qo'shish uchun mijozni tiklang.",
-    "report": "Barcha mijozlar bo'yicha umumiy statistika va har biri bo'yicha batafsil tarix: summalar, to'lov sanalari, muddati o'tganmi. Yuqoridagi filtr grafik va hisoblagichlar davrini o'zgartiradi, \"Eksport\" tugmasi barcha qarzlar ro'yxatini CSV faylga saqlaydi."
+    "report": "Barcha mijozlar bo'yicha umumiy statistika va har biri bo'yicha batafsil tarix: summalar, to'lov sanalari, muddati o'tganmi. Yuqoridagi filtr grafik va hisoblagichlar davrini o'zgartiradi, \"Eksport\" tugmasi barcha qarzlar ro'yxatini CSV faylga saqlaydi.",
+    "credits": "Bu yerda barcha rasmiylashtirilgan kreditlar. Mijozga bosish sanalar bo'yicha to'lov grafigini ochadi — to'lovga bosish uni tasdiqlangan deb belgilaydi (yoki belgini olib tashlaydi). Pastda — shu kredit bo'yicha barcha amallar jurnali."
+  },
+  "credit": {
+    "createButton": "Kredit rasmiylashtirish",
+    "createTitle": "Yangi kredit",
+    "principal": "Kredit summasi",
+    "interestType": "Foiz turi",
+    "interest_none": "Foizsiz",
+    "interest_none_desc": "Summa butun muddatga teng bo'linadi",
+    "interest_flat": "Qat'iy foiz",
+    "interest_flat_desc": "Foiz butun muddat uchun summadan bir marta hisoblanadi",
+    "interest_reducing": "Annuitet (bank kabi)",
+    "interest_reducing_desc": "Bir xil to'lov, foizlar har oy qoldiqdan hisoblanadi",
+    "rate": "Stavka, yillik %",
+    "termMonths": "Muddat, oy",
+    "startDate": "Boshlanish sanasi",
+    "previewMonthly": "Oylik to'lov",
+    "previewTotal": "Jami qaytariladigan",
+    "invalidAmounts": "Summa va muddatni tekshiring — ular noldan katta bo'lishi kerak",
+    "eventCreated": "Kredit rasmiylashtirildi: {{amount}} {{currency}}, {{term}} oyga",
+    "eventConfirmed": "{{date}} sanasidagi {{amount}} to'lov tasdiqlandi",
+    "eventUnconfirmed": "{{date}} sanasidagi to'lov belgisi olib tashlandi",
+    "noCredits": "Hozircha bironta kredit rasmiylashtirilmagan",
+    "scheduleTitle": "To'lov grafigi",
+    "eventsTitle": "Amallar jurnali",
+    "months": "oy"
   }
 }

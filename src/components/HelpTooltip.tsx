@@ -41,6 +41,7 @@ export function HelpTooltip({ text, width = 280 }: Props) {
             top: 'calc(100% + 6px)',
             left: 0,
             width,
+            maxWidth: 'calc(100vw - 40px)',
             background: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
@@ -50,6 +51,7 @@ export function HelpTooltip({ text, width = 280 }: Props) {
             lineHeight: 1.6,
             color: 'var(--color-text-muted)',
             zIndex: 80,
+            boxSizing: 'border-box',
           }}
         >
           {text}
