@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WifiOff, ServerCrash } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
@@ -13,26 +13,31 @@ export function ConnectivityGuard() {
   const { t } = useTranslation();
   const { session } = useApp();
   const [status, setStatus] = useState<Status>('ok');
+  const consecutiveFailuresRef = useRef(0);
 
   const check = useCallback(async () => {
     if (!navigator.onLine) {
+      consecutiveFailuresRef.current = 0;
       setStatus('offline');
       return;
     }
-    // Без активной сессии не дёргаем Supabase лишний раз — supabase-js всё равно
-    // попытается освежить токен при каждом запросе, а если сохранённая сессия битая
-    // (например после долгого простоя или множества тестовых входов), это упирается
-    // в лимит Supabase на обновление токена и крутится по кругу без остановки.
     if (!session) {
+      consecutiveFailuresRef.current = 0;
       setStatus('ok');
       return;
     }
     try {
       const { error } = await supabase.from('app_versions').select('id').limit(1);
       if (error) throw error;
+      consecutiveFailuresRef.current = 0;
       setStatus('ok');
     } catch {
-      setStatus('server');
+      consecutiveFailuresRef.current += 1;
+      // Первый одиночный сбой не показываем — часто это просто разовая заминка сети
+      // или временный лимит сервера. Блокируем экран только если сбой повторился подряд.
+      if (consecutiveFailuresRef.current >= 2) {
+        setStatus('server');
+      }
     }
   }, [session]);
 

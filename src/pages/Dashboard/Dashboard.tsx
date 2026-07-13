@@ -97,6 +97,7 @@ export function Dashboard() {
       .from('debtors')
       .select('id, full_name, phone, created_at')
       .is('archived_at', null)
+      .eq('is_blacklisted', false)
       .order('created_at', { ascending: false });
 
     if (clientsError) {

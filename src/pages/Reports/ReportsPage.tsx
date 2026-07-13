@@ -93,12 +93,20 @@ export function ReportsPage() {
           }))
         );
 
-        // Кредиты — только если модуль включён
+        // Кредиты — только если модуль включён, и клиенты для них полностью отдельные
         if (creditModuleEnabled) {
+          const { data: creditClientsData } = await supabase
+            .from('credit_clients')
+            .select('id, full_name')
+            .is('archived_at', null);
+          const creditClientIds = (creditClientsData ?? []).map((c) => c.id);
+          const creditClientNames: Record<string, string> = {};
+          for (const c of creditClientsData ?? []) creditClientNames[c.id] = c.full_name;
+
           const { data: creditsData } = await supabase
             .from('credits')
-            .select('id, account_number, principal_amount, currency, interest_type, interest_rate, term_months, debtors(full_name)')
-            .in('debtor_id', ids);
+            .select('id, debtor_id, account_number, principal_amount, currency, interest_type, interest_rate, term_months')
+            .in('debtor_id', creditClientIds.length > 0 ? creditClientIds : ['00000000-0000-0000-0000-000000000000']);
 
           const creditIds = (creditsData ?? []).map((c: any) => c.id);
           let creditPaymentsData: any[] = [];
@@ -126,7 +134,7 @@ export function ReportsPage() {
           setCredits(
             (creditsData ?? []).map((c: any) => ({
               id: c.id,
-              debtor_name: c.debtors?.full_name ?? '',
+              debtor_name: creditClientNames[c.debtor_id] ?? '',
               account_number: c.account_number,
               principal_amount: c.principal_amount,
               currency: c.currency,

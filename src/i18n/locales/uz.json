@@ -169,7 +169,8 @@
     "credits": "Kreditlar",
     "sound": "Ovoz",
     "calling": "Telefoniya",
-    "sms": "SMS-xabarnoma"
+    "sms": "SMS-xabarnoma",
+    "blacklist": "Qora ro'yxat"
   },
   "notifications": {
     "title": "Bildirishnomalar",
@@ -203,7 +204,11 @@
     "partialPaymentAmount": "To'lov summasi",
     "paidSoFar": "{{amount}} to'landi",
     "call": "Qo'ng'iroq qilish",
-    "copyPhone": "Raqamni nusxalash"
+    "copyPhone": "Raqamni nusxalash",
+    "confirmMarkPaidTitle": "Qarz to'landi deb belgilansinmi?",
+    "confirmMarkActiveTitle": "Qarz faolga qaytarilsinmi?",
+    "confirmMarkPaidText": "{{amount}} {{currency}} qarz to'liq to'landi deb belgilanadi.",
+    "confirmMarkActiveText": "{{amount}} {{currency}} qarz yana faol (to'lanmagan) bo'ladi."
   },
   "report": {
     "title": "Hisobot",
@@ -275,7 +280,8 @@
     "credits": "Bu yerda barcha rasmiylashtirilgan kreditlar. Mijozga bosish sanalar bo'yicha to'lov grafigini ochadi — to'lovga bosish uni tasdiqlangan deb belgilaydi (yoki belgini olib tashlaydi). Pastda — shu kredit bo'yicha barcha amallar jurnali.",
     "sound": "Ovoz balandligi, tovushi va qaysi hodisalarda ishlashini sozlang — muddati o'tganda, eslatmalarda, yangi versiyalarda.",
     "calling": "Haqiqiy qo'ng'iroq xizmatini (SIP-provayder va h.k.) ulash uchun sozlamalar. Hozircha bu shunchaki forma — qo'ng'iroq yuborish provayder ulangandan keyin ishlaydi.",
-    "sms": "Qarzlar va kreditlar uchun alohida shablonlar bilan SMS yoki pochta orqali eslatma yuborishni sozlang. Haqiqiy yuborish provayder ulangandan keyin ishlaydi."
+    "sms": "Qarzlar va kreditlar uchun alohida shablonlar bilan SMS yoki pochta orqali eslatma yuborishni sozlang. Haqiqiy yuborish provayder ulangandan keyin ishlaydi.",
+    "blacklist": "Bu yerga yuborilgan mijozlar endi oddiy qarzdorlar ro'yxatida ko'rinmaydi. Pastdagi tugma bilan qaytarish mumkin."
   },
   "credit": {
     "createButton": "Kredit rasmiylashtirish",
@@ -319,6 +325,18 @@
     "kpiUpcoming": "Yaqin to'lovlar",
     "pickClientTitle": "Mijozni tanlang",
     "noClientsFound": "Hech kim topilmadi",
-    "noCreditsStatus": "Kredit yo'q"
+    "noCreditsStatus": "Kredit yo'q",
+    "newClientTitle": "Kredit uchun yangi mijoz",
+    "newClientButton": "Yangi mijoz"
+  },
+  "blacklist": {
+    "explainer": "Qora ro'yxatdagi mijozlar asosiy qarzdorlar ro'yxatidan yashiriladi. Ularning qarz tarixi o'chirilmaydi — yana ish olib borish uchun mijozni qaytaring.",
+    "empty": "Qora ro'yxat bo'sh",
+    "remove": "Ro'yxatdan chiqarish",
+    "sendButton": "Qora ro'yxatga yuborish",
+    "confirmTitle": "Qora ro'yxatga yuborilsinmi?",
+    "confirmText": "Mijoz asosiy qarzdorlar ro'yxatidan yo'qoladi. Qarz tarixini «Qora ro'yxat» bo'limida ko'rish mumkin, qaytarish ham o'sha yerdan istalgan vaqtda.",
+    "reasonPlaceholder": "Sabab (ixtiyoriy)",
+    "confirmButton": "Yuborish"
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { Users, Archive, BellRing, BarChart3, Landmark, Volume2, Phone, MessageSquare } from 'lucide-react';
+import { Users, Archive, BellRing, BarChart3, Landmark, Volume2, Phone, MessageSquare, ShieldOff } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 const navItemStyle = (isActive: boolean): React.CSSProperties => ({
@@ -69,6 +69,10 @@ export function AppSidebar() {
       <NavLink to="/archive" style={({ isActive }) => navItemStyle(isActive)}>
         <Archive size={18} />
         {t('sidebar.archive')}
+      </NavLink>
+      <NavLink to="/blacklist" style={({ isActive }) => navItemStyle(isActive)}>
+        <ShieldOff size={18} />
+        {t('sidebar.blacklist')}
       </NavLink>
       <NavLink to="/reports" style={({ isActive }) => navItemStyle(isActive)}>
         <BarChart3 size={18} />

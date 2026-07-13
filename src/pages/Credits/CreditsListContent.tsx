@@ -39,7 +39,7 @@ export function CreditsListContent({ refreshKey }: { refreshKey?: number }) {
 
   async function load() {
     const { data: debtorsData } = await supabase
-      .from('debtors')
+      .from('credit_clients')
       .select('id, full_name, phone, created_at')
       .is('archived_at', null)
       .order('created_at', { ascending: false });

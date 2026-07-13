@@ -6,6 +6,7 @@ import { RegisterStep } from './pages/Onboarding/RegisterStep';
 import { LoginStep } from './pages/Onboarding/LoginStep';
 import { Dashboard } from './pages/Dashboard/Dashboard';
 import { ArchivePage } from './pages/Archive/ArchivePage';
+import { BlacklistPage } from './pages/Blacklist/BlacklistPage';
 import { RemindersPage } from './pages/Reminders/RemindersPage';
 import { ReportsPage } from './pages/Reports/ReportsPage';
 import { ProfilePage } from './pages/Profile/ProfilePage';
@@ -61,6 +62,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <ArchivePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/blacklist"
+          element={
+            <PrivateRoute>
+              <BlacklistPage />
             </PrivateRoute>
           }
         />

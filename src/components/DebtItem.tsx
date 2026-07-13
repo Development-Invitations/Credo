@@ -29,6 +29,7 @@ export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
   const { showToast } = useToast();
   const [showPartial, setShowPartial] = useState(false);
   const [partialAmount, setPartialAmount] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const remaining = Math.max(Number(debt.amount) - Number(debt.paid_amount || 0), 0);
   const overdue =
@@ -109,7 +110,7 @@ export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
           )}
           {!readOnly && !showPartial && (
             <IconBtn
-              onClick={debt.status === 'active' ? markFullyPaid : markActive}
+              onClick={() => setShowConfirm(true)}
               title={debt.status === 'active' ? t('clientDetail.markPaid') : t('clientDetail.markActive')}
             >
               {debt.status === 'active' ? <CheckCircle2 size={16} /> : <RotateCcw size={16} />}
@@ -130,6 +131,46 @@ export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
             {t('reminders.save')}
           </Button>
         </form>
+      )}
+
+      {showConfirm && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 150,
+          }}
+          onClick={() => setShowConfirm(false)}
+        >
+          <div className="card" style={{ maxWidth: 360, boxShadow: 'var(--shadow-elevated)' }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: 10 }}>
+              {debt.status === 'active' ? t('clientDetail.confirmMarkPaidTitle') : t('clientDetail.confirmMarkActiveTitle')}
+            </h3>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 16 }}>
+              {debt.status === 'active'
+                ? t('clientDetail.confirmMarkPaidText', { amount: Number(debt.amount).toLocaleString(), currency: debt.currency })
+                : t('clientDetail.confirmMarkActiveText', { amount: Number(debt.amount).toLocaleString(), currency: debt.currency })}
+            </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setShowConfirm(false)}>
+                {t('debtorForm.cancel')}
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (debt.status === 'active') await markFullyPaid();
+                  else await markActive();
+                  setShowConfirm(false);
+                }}
+              >
+                {t('credit.confirmActionButton')}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

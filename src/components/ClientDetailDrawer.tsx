@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, BellRing, Phone, Copy } from 'lucide-react';
+import { Plus, BellRing, Phone, Copy, ShieldOff } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { Drawer } from './Drawer';
 import { Button } from './Button';
+import { Input } from './Input';
 import { DebtItem, DebtRow } from './DebtItem';
 import { AddDebtModal } from './AddDebtModal';
 import { RemindersModal } from './RemindersModal';
@@ -25,7 +26,19 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
   const [loading, setLoading] = useState(true);
   const [showAddDebt, setShowAddDebt] = useState(false);
   const [showReminders, setShowReminders] = useState(false);
+  const [showBlacklistPrompt, setShowBlacklistPrompt] = useState(false);
+  const [blacklistReason, setBlacklistReason] = useState('');
   const callingEnabled = localStorage.getItem('callingEnabled') === 'true';
+
+  async function sendToBlacklist() {
+    await supabase
+      .from('debtors')
+      .update({ is_blacklisted: true, blacklist_reason: blacklistReason || null, blacklisted_at: new Date().toISOString() })
+      .eq('id', clientId);
+    setShowBlacklistPrompt(false);
+    onDebtsChanged();
+    onClose();
+  }
 
   async function load() {
     const { data } = await supabase
@@ -137,6 +150,64 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
           <DebtItem key={d.id} debt={d} clientId={clientId} onChanged={load} readOnly={readOnly} />
         ))}
       </div>
+
+      {!readOnly && (
+        <button
+          onClick={() => setShowBlacklistPrompt(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--color-danger)',
+            fontSize: 12,
+            cursor: 'pointer',
+            marginTop: 20,
+            padding: 0,
+          }}
+        >
+          <ShieldOff size={14} />
+          {t('blacklist.sendButton')}
+        </button>
+      )}
+
+      {showBlacklistPrompt && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 150,
+          }}
+          onClick={() => setShowBlacklistPrompt(false)}
+        >
+          <div className="card" style={{ width: 360, boxShadow: 'var(--shadow-elevated)' }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: 10 }}>{t('blacklist.confirmTitle')}</h3>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 12 }}>{t('blacklist.confirmText')}</p>
+            <Input
+              placeholder={t('blacklist.reasonPlaceholder') ?? ''}
+              value={blacklistReason}
+              onChange={(e) => setBlacklistReason(e.target.value)}
+              style={{ marginBottom: 16 }}
+            />
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setShowBlacklistPrompt(false)}>
+                {t('debtorForm.cancel')}
+              </Button>
+              <Button
+                onClick={sendToBlacklist}
+                style={{ background: 'var(--color-danger)', color: '#fff' }}
+              >
+                {t('blacklist.confirmButton')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showAddDebt && (
         <AddDebtModal
