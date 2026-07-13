@@ -132,7 +132,10 @@
     "emailSmtpPort": "Порт",
     "emailLogin": "Логин / Email",
     "emailPassword": "Пароль",
-    "emailFromName": "Имя отправителя"
+    "emailFromName": "Имя отправителя",
+    "smsDaysBeforeLabel": "За сколько дней до срока напоминать",
+    "smsDaysBeforeCount": "{{count}} дн.",
+    "smsDaysBeforeHint": "Применяется и к SMS, и к письмам на почту — независимо от того, какой канал выбран ниже. Работает одинаково для долгов и для кредитов."
   },
   "errors": {
     "generic": "Что-то пошло не так. Попробуйте ещё раз.",
@@ -310,6 +313,12 @@
     "confirmActionButton": "Подтвердить",
     "totalLabel": "Итого",
     "eventPaidBatch": "Оплачено платежей: {{count}} на сумму {{amount}} {{currency}}",
-    "eventEarlyRepayment": "Досрочное погашение: {{count}} платеж(ей) на {{amount}} {{currency}}"
+    "eventEarlyRepayment": "Досрочное погашение: {{count}} платеж(ей) на {{amount}} {{currency}}",
+    "kpiTotalRemaining": "Общая сумма кредитов",
+    "kpiActive": "Активные кредиты",
+    "kpiUpcoming": "Ближайшие платежи",
+    "pickClientTitle": "Выберите клиента",
+    "noClientsFound": "Никого не нашлось",
+    "noCreditsStatus": "Нет кредитов"
   }
 }

@@ -132,7 +132,10 @@
     "emailSmtpPort": "Port",
     "emailLogin": "Login / Email",
     "emailPassword": "Parol",
-    "emailFromName": "Jo'natuvchi nomi"
+    "emailFromName": "Jo'natuvchi nomi",
+    "smsDaysBeforeLabel": "Muddatdan necha kun oldin eslatish",
+    "smsDaysBeforeCount": "{{count}} kun",
+    "smsDaysBeforeHint": "SMS uchun ham, pochta xatlari uchun ham qo'llaniladi — pastda qaysi kanal tanlanganidan qat'i nazar. Qarzlar va kreditlar uchun bir xil ishlaydi."
   },
   "errors": {
     "generic": "Nimadir xato ketdi. Qayta urinib ko'ring.",
@@ -310,6 +313,12 @@
     "confirmActionButton": "Tasdiqlash",
     "totalLabel": "Jami",
     "eventPaidBatch": "To'landi: {{count}} ta to'lov, {{amount}} {{currency}}",
-    "eventEarlyRepayment": "Muddatidan oldin to'lov: {{count}} ta, {{amount}} {{currency}}"
+    "eventEarlyRepayment": "Muddatidan oldin to'lov: {{count}} ta, {{amount}} {{currency}}",
+    "kpiTotalRemaining": "Umumiy kredit summasi",
+    "kpiActive": "Faol kreditlar",
+    "kpiUpcoming": "Yaqin to'lovlar",
+    "pickClientTitle": "Mijozni tanlang",
+    "noClientsFound": "Hech kim topilmadi",
+    "noCreditsStatus": "Kredit yo'q"
   }
 }

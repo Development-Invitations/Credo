@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabaseClient';
-import { translateAuthError } from '../lib/authErrors';
+import { friendlyErrorMessage, logError } from '../lib/errorLog';
 import { CURRENCIES } from '../lib/currency';
 import { buildSchedule, InterestType } from '../lib/creditCalc';
 import { Button } from './Button';
@@ -83,7 +83,8 @@ export function CreateCreditModal({ debtorId, defaultCurrency, onClose, onCreate
       .single();
 
     if (creditError || !credit) {
-      setError(translateAuthError(creditError?.message ?? '', t));
+      logError('create_credit', new Error(creditError?.message ?? 'unknown'));
+      setError(friendlyErrorMessage(creditError?.message ?? '', t));
       setSaving(false);
       return;
     }
@@ -99,7 +100,8 @@ export function CreateCreditModal({ debtorId, defaultCurrency, onClose, onCreate
 
     const { error: paymentsError } = await supabase.from('credit_payments').insert(paymentRows);
     if (paymentsError) {
-      setError(translateAuthError(paymentsError.message, t));
+      logError('create_credit_payments', new Error(paymentsError.message));
+      setError(friendlyErrorMessage(paymentsError.message, t));
       setSaving(false);
       return;
     }

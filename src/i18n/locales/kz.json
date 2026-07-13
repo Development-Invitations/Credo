@@ -132,7 +132,10 @@
     "emailSmtpPort": "Порт",
     "emailLogin": "Логин / Email",
     "emailPassword": "Құпия сөз",
-    "emailFromName": "Жіберуші аты"
+    "emailFromName": "Жіберуші аты",
+    "smsDaysBeforeLabel": "Мерзімге дейін неше күн бұрын еске салу",
+    "smsDaysBeforeCount": "{{count}} күн",
+    "smsDaysBeforeHint": "SMS-ке де, поштаға да қолданылады — төменде қай арна таңдалғанына қарамастан. Қарыздар мен несиелер үшін бірдей жұмыс істейді."
   },
   "errors": {
     "generic": "Бірдеңе дұрыс болмады. Қайта көріңіз.",
@@ -310,6 +313,12 @@
     "confirmActionButton": "Растау",
     "totalLabel": "Барлығы",
     "eventPaidBatch": "Төленді: {{count}} төлем, {{amount}} {{currency}}",
-    "eventEarlyRepayment": "Мерзімінен бұрын өтеу: {{count}} төлем, {{amount}} {{currency}}"
+    "eventEarlyRepayment": "Мерзімінен бұрын өтеу: {{count}} төлем, {{amount}} {{currency}}",
+    "kpiTotalRemaining": "Жалпы несие сомасы",
+    "kpiActive": "Белсенді несиелер",
+    "kpiUpcoming": "Жақын төлемдер",
+    "pickClientTitle": "Клиентті таңдаңыз",
+    "noClientsFound": "Ешкім табылмады",
+    "noCreditsStatus": "Несие жоқ"
   }
 }

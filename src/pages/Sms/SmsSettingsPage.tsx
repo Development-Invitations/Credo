@@ -11,6 +11,7 @@ const DEFAULT_CREDIT_TEMPLATE = 'Здравствуйте, {{name}}! Ближа�
 export function SmsSettingsPage() {
   const { t } = useTranslation();
   const [destination, setDestination] = useState(localStorage.getItem('smsDestination') || 'phone');
+  const [daysBefore, setDaysBefore] = useState(localStorage.getItem('smsDaysBefore') || '3');
 
   const [provider, setProvider] = useState(localStorage.getItem('smsProvider') || 'eskiz');
   const [senderPhone, setSenderPhone] = useState(localStorage.getItem('smsSenderPhone') || '');
@@ -37,12 +38,48 @@ export function SmsSettingsPage() {
     localStorage.setItem('smsDestination', v);
   }
 
+  function changeDaysBefore(v: string) {
+    setDaysBefore(v);
+    localStorage.setItem('smsDaysBefore', v);
+  }
+
   return (
     <div style={{ maxWidth: 1120, margin: '32px auto', padding: '0 24px 40px' }}>
       <h1 style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
         {t('sidebar.sms')}
         <HelpTooltip text={t('help.sms')} width={300} />
       </h1>
+
+      <div className="card" style={{ marginBottom: 20 }}>
+        <label style={{ fontSize: 13, display: 'block', marginBottom: 6 }}>{t('settings.smsDaysBeforeLabel')}</label>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+          {[1, 2, 3, 5, 7].map((d) => (
+            <button
+              key={d}
+              onClick={() => changeDaysBefore(String(d))}
+              style={{
+                padding: '8px 14px',
+                borderRadius: 'var(--radius-sm)',
+                border: String(d) === daysBefore ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+                background: String(d) === daysBefore ? 'var(--color-accent)' : 'transparent',
+                color: String(d) === daysBefore ? 'var(--color-accent-text)' : 'var(--color-text)',
+                cursor: 'pointer',
+                fontSize: 13,
+              }}
+            >
+              {t('settings.smsDaysBeforeCount', { count: d })}
+            </button>
+          ))}
+          <Input
+            type="number"
+            min="1"
+            value={daysBefore}
+            onChange={(e) => changeDaysBefore(e.target.value)}
+            style={{ width: 70 }}
+          />
+        </div>
+        <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 8 }}>{t('settings.smsDaysBeforeHint')}</p>
+      </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
         <button

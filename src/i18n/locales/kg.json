@@ -132,7 +132,10 @@
     "emailSmtpPort": "Порт",
     "emailLogin": "Логин / Email",
     "emailPassword": "Сыр сөз",
-    "emailFromName": "Жөнөтүүчүнүн аты"
+    "emailFromName": "Жөнөтүүчүнүн аты",
+    "smsDaysBeforeLabel": "Мөөнөткө чейин канча күн мурда эскертүү",
+    "smsDaysBeforeCount": "{{count}} күн",
+    "smsDaysBeforeHint": "SMS үчүн да, почта каттары үчүн да колдонулат — төмөндө кайсы канал тандалганына карабастан. Карыздар жана кредиттер үчүн бирдей иштейт."
   },
   "errors": {
     "generic": "Бир нерсе туура болбоду. Кайра аракет кылыңыз.",
@@ -310,6 +313,12 @@
     "confirmActionButton": "Ырастоо",
     "totalLabel": "Баары",
     "eventPaidBatch": "Төлөндү: {{count}} төлөм, {{amount}} {{currency}}",
-    "eventEarlyRepayment": "Мөөнөтүнөн мурда төлөө: {{count}} төлөм, {{amount}} {{currency}}"
+    "eventEarlyRepayment": "Мөөнөтүнөн мурда төлөө: {{count}} төлөм, {{amount}} {{currency}}",
+    "kpiTotalRemaining": "Жалпы кредит суммасы",
+    "kpiActive": "Активдүү кредиттер",
+    "kpiUpcoming": "Жакынкы төлөмдөр",
+    "pickClientTitle": "Кардарды тандаңыз",
+    "noClientsFound": "Эч ким табылган жок",
+    "noCreditsStatus": "Кредит жок"
   }
 }

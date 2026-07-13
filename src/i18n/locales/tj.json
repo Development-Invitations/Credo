@@ -132,7 +132,10 @@
     "emailSmtpPort": "Порт",
     "emailLogin": "Логин / Email",
     "emailPassword": "Рамз",
-    "emailFromName": "Номи фиристанда"
+    "emailFromName": "Номи фиристанда",
+    "smsDaysBeforeLabel": "Чанд рӯз пеш аз мӯҳлат ёдоварӣ кардан",
+    "smsDaysBeforeCount": "{{count}} рӯз",
+    "smsDaysBeforeHint": "Ҳам барои SMS, ҳам барои мактубҳои почта татбиқ мешавад — новобаста аз он, ки дар поён кадом канал интихоб шудааст. Барои қарзҳо ва кредитҳо якхела кор мекунад."
   },
   "errors": {
     "generic": "Хатое рух дод. Бори дигар кӯшиш кунед.",
@@ -310,6 +313,12 @@
     "confirmActionButton": "Тасдиқ",
     "totalLabel": "Ҳамагӣ",
     "eventPaidBatch": "Пардохт шуд: {{count}} пардохт ба маблағи {{amount}} {{currency}}",
-    "eventEarlyRepayment": "Пардохти пешакӣ: {{count}} пардохт ба {{amount}} {{currency}}"
+    "eventEarlyRepayment": "Пардохти пешакӣ: {{count}} пардохт ба {{amount}} {{currency}}",
+    "kpiTotalRemaining": "Маблағи умумии кредитҳо",
+    "kpiActive": "Кредитҳои фаъол",
+    "kpiUpcoming": "Пардохтҳои наздик",
+    "pickClientTitle": "Мизоҷро интихоб кунед",
+    "noClientsFound": "Ҳеҷ кас ёфт нашуд",
+    "noCreditsStatus": "Кредит нест"
   }
 }

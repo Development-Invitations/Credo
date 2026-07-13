@@ -224,7 +224,37 @@ export function ReportsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `credo-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `credo-report-dolgi-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportCreditsCsv() {
+    const rows: string[] = ['Клиент,Лицевой счёт,Сумма кредита,Валюта,Тип процента,Ставка,Срок (мес),Дата платежа,Ожидаемая сумма,Подтверждён,Оплачено'];
+    for (const c of credits) {
+      for (const p of c.payments) {
+        rows.push(
+          [
+            c.debtor_name,
+            c.account_number ?? '',
+            c.principal_amount,
+            c.currency,
+            c.interest_type,
+            c.interest_rate,
+            c.term_months,
+            new Date(p.due_date).toLocaleDateString(),
+            p.expected_amount,
+            p.is_confirmed ? 'да' : 'нет',
+            p.paid_amount,
+          ].join(',')
+        );
+      }
+    }
+    const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `credo-report-krediti-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -242,8 +272,12 @@ export function ReportsPage() {
           {t('report.title')}
           <HelpTooltip text={t('help.report')} />
         </h1>
-        {tab === 'debts' && (
-          <Button variant="secondary" onClick={exportCsv} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {(tab === 'debts' || tab === 'credits') && (
+          <Button
+            variant="secondary"
+            onClick={tab === 'debts' ? exportCsv : exportCreditsCsv}
+            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+          >
             <Download size={15} />
             {t('report.exportCsv')}
           </Button>
