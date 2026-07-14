@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { Users, Archive, BellRing, BarChart3, Landmark, Volume2, Phone, MessageSquare, ShieldOff } from 'lucide-react';
+import { Users, Archive, BellRing, BarChart3, Landmark, Volume2, Phone, MessageSquare, ShieldOff, Home } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 const navItemStyle = (isActive: boolean): React.CSSProperties => ({
@@ -34,6 +34,10 @@ export function AppSidebar() {
         gap: 4,
       }}
     >
+      <NavLink to="/home" style={({ isActive }) => navItemStyle(isActive)}>
+        <Home size={18} />
+        {t('sidebar.home')}
+      </NavLink>
       <NavLink to="/dashboard" style={({ isActive }) => navItemStyle(isActive)}>
         <Users size={18} />
         {t('sidebar.debtors')}

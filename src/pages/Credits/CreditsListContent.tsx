@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, AlertTriangle, ArrowUpDown, Search } from 'lucide-react';
+import { ChevronRight, AlertTriangle, ArrowUpDown, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { CreditAccordionItem, CreditData } from '../../components/CreditAccordionItem';
+import { CreditClientDetailDrawer } from '../../components/CreditClientDetailDrawer';
 import { Pagination } from '../../components/Pagination';
 
 interface ClientCredits {
@@ -31,7 +32,7 @@ export function CreditsListContent({ refreshKey }: { refreshKey?: number }) {
   const { t } = useTranslation();
   const [clients, setClients] = useState<ClientCredits[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [detailClientId, setDetailClientId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<StatusFilter>('all');
   const [dateSort, setDateSort] = useState<DateSort>('newest');
   const [search, setSearch] = useState('');
@@ -49,7 +50,7 @@ export function CreditsListContent({ refreshKey }: { refreshKey?: number }) {
     if (debtorIds.length > 0) {
       const { data } = await supabase
         .from('credits')
-        .select('id, debtor_id, account_number, principal_amount, currency, interest_type, interest_rate, term_months')
+        .select('id, credit_number, debtor_id, account_number, principal_amount, currency, interest_type, interest_rate, term_months')
         .in('debtor_id', debtorIds);
       creditsRaw = data ?? [];
     }
@@ -83,6 +84,7 @@ export function CreditsListContent({ refreshKey }: { refreshKey?: number }) {
       (creditsByDebtor[c.debtor_id] ??= []).push({
         id: c.id,
         debtor_name: '',
+        credit_number: c.credit_number,
         account_number: c.account_number,
         principal_amount: c.principal_amount,
         currency: c.currency,
@@ -165,15 +167,6 @@ export function CreditsListContent({ refreshKey }: { refreshKey?: number }) {
 
   const totalPages = Math.max(1, Math.ceil(filteredSorted.length / PAGE_SIZE));
   const pageClients = filteredSorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  function toggleExpand(id: string) {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
 
   const tabs: { key: StatusFilter; label: string; count: number }[] = [
     { key: 'all', label: t('dashboard.tabAll'), count: counts.all },
@@ -274,77 +267,66 @@ export function CreditsListContent({ refreshKey }: { refreshKey?: number }) {
         {pageClients.map((c) => {
           const status = clientStatus(c);
           const isOverdue = status === 'overdue';
-          const isOpen = expanded.has(c.id);
           const sumsMap: Record<string, number> = {};
           for (const cr of c.credits) for (const p of cr.payments) if (!p.is_confirmed) sumsMap[cr.currency] = (sumsMap[cr.currency] || 0) + Number(p.expected_amount);
           const sums = Object.entries(sumsMap);
 
           return (
-            <div key={c.id}>
-              <div
-                className="card"
-                onClick={() => c.credits.length > 0 && toggleExpand(c.id)}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  cursor: c.credits.length > 0 ? 'pointer' : 'default',
-                  borderColor: isOverdue ? 'var(--color-danger)' : 'var(--color-border)',
-                  background: isOverdue ? 'color-mix(in srgb, var(--color-danger) 8%, var(--color-surface))' : 'var(--color-surface)',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    {isOverdue && <AlertTriangle size={14} color="var(--color-danger)" />}
-                    <span>{c.full_name}</span>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      padding: '2px 8px',
-                      borderRadius: 20,
-                      background:
-                        status === 'overdue' ? 'var(--color-danger)' : status === 'active' ? 'var(--color-accent)' : status === 'noCredits' ? 'var(--color-border)' : 'var(--color-success)',
-                      color: status === 'noCredits' ? 'var(--color-text-muted)' : '#fff',
-                    }}
-                  >
-                    {status === 'overdue'
-                      ? t('dashboard.statusOverdue')
-                      : status === 'active'
-                      ? t('dashboard.statusActive')
-                      : status === 'noCredits'
-                      ? t('credit.noCreditsStatus')
-                      : t('dashboard.statusPaid')}
-                  </span>
+            <div
+              key={c.id}
+              className="card"
+              onClick={() => c.credits.length > 0 && setDetailClientId(c.id)}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: c.credits.length > 0 ? 'pointer' : 'default',
+                borderColor: isOverdue ? 'var(--color-danger)' : 'var(--color-border)',
+                background: isOverdue ? 'color-mix(in srgb, var(--color-danger) 8%, var(--color-surface))' : 'var(--color-surface)',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  {isOverdue && <AlertTriangle size={14} color="var(--color-danger)" />}
+                  <span>{c.full_name}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {sums.length > 0 && (
-                    <span className="amount" style={{ fontSize: 15 }}>
-                      {sums.map(([cur, amt]) => `${amt.toLocaleString()} ${cur}`).join(' + ')}
-                    </span>
-                  )}
-                  {c.credits.length > 0 &&
-                    (isOpen ? (
-                      <ChevronDown size={16} color="var(--color-text-muted)" />
-                    ) : (
-                      <ChevronRight size={16} color="var(--color-text-muted)" />
-                    ))}
-                </div>
+                <span
+                  style={{
+                    fontSize: 12,
+                    padding: '2px 8px',
+                    borderRadius: 20,
+                    background:
+                      status === 'overdue' ? 'var(--color-danger)' : status === 'active' ? 'var(--color-accent)' : status === 'noCredits' ? 'var(--color-border)' : 'var(--color-success)',
+                    color: status === 'noCredits' ? 'var(--color-text-muted)' : '#fff',
+                  }}
+                >
+                  {status === 'overdue'
+                    ? t('dashboard.statusOverdue')
+                    : status === 'active'
+                    ? t('dashboard.statusActive')
+                    : status === 'noCredits'
+                    ? t('credit.noCreditsStatus')
+                    : t('dashboard.statusPaid')}
+                </span>
               </div>
-
-              {isOpen && (
-                <div style={{ display: 'grid', gap: 8, marginTop: 8, paddingLeft: 16 }}>
-                  {c.credits.map((cr) => (
-                    <CreditAccordionItem key={cr.id} credit={cr} onChanged={load} />
-                  ))}
-                </div>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {sums.length > 0 && (
+                  <span className="amount" style={{ fontSize: 15 }}>
+                    {sums.map(([cur, amt]) => `${amt.toLocaleString()} ${cur}`).join(' + ')}
+                  </span>
+                )}
+                {c.credits.length > 0 && <ChevronRight size={16} color="var(--color-text-muted)" />}
+              </div>
             </div>
           );
         })}
       </div>
 
       <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+
+      {detailClientId && (
+        <CreditClientDetailDrawer clientId={detailClientId} onClose={() => setDetailClientId(null)} onChanged={load} />
+      )}
     </div>
   );
 }

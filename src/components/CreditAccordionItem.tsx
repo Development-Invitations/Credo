@@ -21,6 +21,7 @@ export interface CreditEvent {
 
 export interface CreditData {
   id: string;
+  credit_number: number | null;
   debtor_name: string;
   account_number: string | null;
   principal_amount: number;
@@ -125,6 +126,7 @@ export function CreditAccordionItem({ credit: c, onChanged }: Props) {
             {c.debtor_name}
           </div>
           <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+            {c.credit_number ? `№${c.credit_number} · ` : ''}
             {c.account_number ? `${c.account_number} · ` : ''}
             {t(`credit.interest_${c.interest_type}`)}
             {c.interest_type !== 'none' ? ` · ${c.interest_rate}%` : ''} · {c.term_months} {t('credit.months')}

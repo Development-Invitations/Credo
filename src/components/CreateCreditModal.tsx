@@ -9,6 +9,7 @@ import { Input } from './Input';
 import { AmountInput } from './AmountInput';
 import { Select } from './Select';
 import { ErrorBanner } from './ErrorBanner';
+import { useToast } from '../context/ToastContext';
 
 interface Props {
   debtorId: string;
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function CreateCreditModal({ debtorId, defaultCurrency, onClose, onCreated }: Props) {
+  const { showToast } = useToast();
   const { t } = useTranslation();
   const [principal, setPrincipal] = useState('');
   const [currency, setCurrency] = useState(defaultCurrency);
@@ -63,7 +65,7 @@ export function CreateCreditModal({ debtorId, defaultCurrency, onClose, onCreate
       return;
     }
 
-    const accountNumber = `CR-${Date.now().toString(36).toUpperCase()}`;
+    const accountNumber = String(Math.floor(10000000 + Math.random() * 90000000));
 
     const { data: credit, error: creditError } = await supabase
       .from('credits')
@@ -79,7 +81,7 @@ export function CreateCreditModal({ debtorId, defaultCurrency, onClose, onCreate
         start_date: startDate,
         comment: comment || null,
       })
-      .select('id')
+      .select('id, credit_number')
       .single();
 
     if (creditError || !credit) {
@@ -114,6 +116,7 @@ export function CreateCreditModal({ debtorId, defaultCurrency, onClose, onCreate
     });
 
     setSaving(false);
+    showToast(t('credit.createdToast', { number: credit.credit_number }), 'success');
     onCreated();
     onClose();
   }

@@ -105,7 +105,7 @@ export function ReportsPage() {
 
           const { data: creditsData } = await supabase
             .from('credits')
-            .select('id, debtor_id, account_number, principal_amount, currency, interest_type, interest_rate, term_months')
+            .select('id, credit_number, debtor_id, account_number, principal_amount, currency, interest_type, interest_rate, term_months')
             .in('debtor_id', creditClientIds.length > 0 ? creditClientIds : ['00000000-0000-0000-0000-000000000000']);
 
           const creditIds = (creditsData ?? []).map((c: any) => c.id);
@@ -135,6 +135,7 @@ export function ReportsPage() {
             (creditsData ?? []).map((c: any) => ({
               id: c.id,
               debtor_name: creditClientNames[c.debtor_id] ?? '',
+              credit_number: c.credit_number,
               account_number: c.account_number,
               principal_amount: c.principal_amount,
               currency: c.currency,

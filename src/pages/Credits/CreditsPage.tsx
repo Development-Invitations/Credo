@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { Landmark } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { HelpTooltip } from '../../components/HelpTooltip';
@@ -9,9 +10,15 @@ import { CreditsListContent } from './CreditsListContent';
 
 export function CreditsPage() {
   const { t } = useTranslation();
+  const location = useLocation();
   const { currency } = useApp();
   const [refreshKey, setRefreshKey] = useState(0);
   const { openPicker, modals } = useQuickCreateCredit(() => setRefreshKey((k) => k + 1), currency);
+
+  useEffect(() => {
+    if ((location.state as any)?.openAdd) openPicker();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div style={{ maxWidth: 1120, margin: '32px auto', padding: '0 24px 40px' }}>

@@ -54,7 +54,8 @@
     "comment": "Izoh",
     "save": "Saqlash",
     "cancel": "Bekor qilish",
-    "dueDate": "Qaytarish muddati"
+    "dueDate": "Qaytarish muddati",
+    "email": "Elektron pochta"
   },
   "reminders": {
     "title": "Eslatmalar",
@@ -170,7 +171,8 @@
     "sound": "Ovoz",
     "calling": "Telefoniya",
     "sms": "SMS-xabarnoma",
-    "blacklist": "Qora ro'yxat"
+    "blacklist": "Qora ro'yxat",
+    "home": "Bosh sahifa"
   },
   "notifications": {
     "title": "Bildirishnomalar",
@@ -281,7 +283,8 @@
     "sound": "Ovoz balandligi, tovushi va qaysi hodisalarda ishlashini sozlang — muddati o'tganda, eslatmalarda, yangi versiyalarda.",
     "calling": "Haqiqiy qo'ng'iroq xizmatini (SIP-provayder va h.k.) ulash uchun sozlamalar. Hozircha bu shunchaki forma — qo'ng'iroq yuborish provayder ulangandan keyin ishlaydi.",
     "sms": "Qarzlar va kreditlar uchun alohida shablonlar bilan SMS yoki pochta orqali eslatma yuborishni sozlang. Haqiqiy yuborish provayder ulangandan keyin ishlaydi.",
-    "blacklist": "Bu yerga yuborilgan mijozlar endi oddiy qarzdorlar ro'yxatida ko'rinmaydi. Pastdagi tugma bilan qaytarish mumkin."
+    "blacklist": "Bu yerga yuborilgan mijozlar endi oddiy qarzdorlar ro'yxatida ko'rinmaydi. Pastdagi tugma bilan qaytarish mumkin.",
+    "home": "Asosiy amallarga tezkor kirish va pul bo'yicha umumiy manzara — bu oyda qarzlar va kreditlar bo'yicha qancha yig'ilgani, hamda foiz bo'yicha kutilayotgan foyda."
   },
   "credit": {
     "createButton": "Kredit rasmiylashtirish",
@@ -327,7 +330,12 @@
     "noClientsFound": "Hech kim topilmadi",
     "noCreditsStatus": "Kredit yo'q",
     "newClientTitle": "Kredit uchun yangi mijoz",
-    "newClientButton": "Yangi mijoz"
+    "newClientButton": "Yangi mijoz",
+    "passportData": "Pasport ma'lumotlari",
+    "address": "Manzil",
+    "noExtraData": "Qo'shimcha ma'lumot yo'q",
+    "creditsHistory": "Kreditlar tarixi",
+    "createdToast": "№{{number}} kredit muvaffaqiyatli rasmiylashtirildi"
   },
   "blacklist": {
     "explainer": "Qora ro'yxatdagi mijozlar asosiy qarzdorlar ro'yxatidan yashiriladi. Ularning qarz tarixi o'chirilmaydi — yana ish olib borish uchun mijozni qaytaring.",
@@ -338,5 +346,14 @@
     "confirmText": "Mijoz asosiy qarzdorlar ro'yxatidan yo'qoladi. Qarz tarixini «Qora ro'yxat» bo'limida ko'rish mumkin, qaytarish ham o'sha yerdan istalgan vaqtda.",
     "reasonPlaceholder": "Sabab (ixtiyoriy)",
     "confirmButton": "Yuborish"
+  },
+  "home": {
+    "kpiTitle": "Ko'rsatkichlar",
+    "debtsCollectedMonth": "Qarzlar bo'yicha yig'ildi (oy)",
+    "debtsCollectedHint": "Joriy oy boshidan beri qarzlar bo'yicha barcha to'lov belgilari yig'indisi.",
+    "creditsCollectedMonth": "Kreditlar bo'yicha yig'ildi (oy)",
+    "creditsCollectedHint": "Joriy oy boshidan beri kreditlar bo'yicha tasdiqlangan to'lovlar yig'indisi.",
+    "creditsProfit": "Kreditlar bo'yicha kutilayotgan foyda",
+    "creditsProfitHint": "Jadval bo'yicha qaytariladigan to'liq summa (tan narx + foizlar) bilan berilgan summa o'rtasidagi farq — barcha kreditlar bo'yicha. Bu oy uchun emas, balki kreditlarning butun davri uchun umumiy manzara."
   }
 }

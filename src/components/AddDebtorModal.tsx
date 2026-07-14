@@ -5,6 +5,7 @@ import { translateAuthError } from '../lib/authErrors';
 import { Button } from './Button';
 import { Input } from './Input';
 import { PhoneInput } from './PhoneInput';
+import { EmailInput } from './EmailInput';
 import { ErrorBanner } from './ErrorBanner';
 
 interface Props {
@@ -17,6 +18,7 @@ export function AddDebtorModal({ onClose, onCreated }: Props) {
   const { t } = useTranslation();
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [comment, setComment] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export function AddDebtorModal({ onClose, onCreated }: Props) {
 
     const { data, error } = await supabase
       .from('debtors')
-      .insert({ user_id: user.id, full_name: fullName, phone: phone || null, comment: comment || null })
+      .insert({ user_id: user.id, full_name: fullName, phone: phone || null, email: email || null, comment: comment || null })
       .select('id')
       .single();
 
@@ -76,6 +78,7 @@ export function AddDebtorModal({ onClose, onCreated }: Props) {
             required
           />
           <PhoneInput placeholder={t('debtorForm.phone') ?? ''} value={phone} onChange={setPhone} />
+          <EmailInput placeholder={t('debtorForm.email') ?? ''} value={email} onChange={setEmail} />
           <Input
             placeholder={t('debtorForm.comment') ?? ''}
             value={comment}

@@ -5,6 +5,7 @@ import { friendlyErrorMessage, logError } from '../lib/errorLog';
 import { Button } from './Button';
 import { Input } from './Input';
 import { PhoneInput } from './PhoneInput';
+import { EmailInput } from './EmailInput';
 import { ErrorBanner } from './ErrorBanner';
 
 interface Props {
@@ -12,11 +13,15 @@ interface Props {
   onCreated: (newClientId: string) => void;
 }
 
-/** Создание клиента для кредита — полностью отдельная база от клиентов долгов. */
+/** Создание клиента для кредита — полностью отдельная база от клиентов долгов,
+ * с расширенными данными (паспорт, адрес), так как кредит — более формальный продукт. */
 export function AddCreditClientModal({ onClose, onCreated }: Props) {
   const { t } = useTranslation();
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [passportData, setPassportData] = useState('');
+  const [address, setAddress] = useState('');
   const [comment, setComment] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +43,15 @@ export function AddCreditClientModal({ onClose, onCreated }: Props) {
 
     const { data, error } = await supabase
       .from('credit_clients')
-      .insert({ user_id: user.id, full_name: fullName, phone: phone || null, comment: comment || null })
+      .insert({
+        user_id: user.id,
+        full_name: fullName,
+        phone: phone || null,
+        email: email || null,
+        passport_data: passportData || null,
+        address: address || null,
+        comment: comment || null,
+      })
       .select('id')
       .single();
 
@@ -67,7 +80,11 @@ export function AddCreditClientModal({ onClose, onCreated }: Props) {
       }}
       onClick={onClose}
     >
-      <div className="card" style={{ width: 380, boxShadow: 'var(--shadow-elevated)' }} onClick={(e) => e.stopPropagation()}>
+      <div
+        className="card"
+        style={{ width: 420, maxHeight: '85vh', overflowY: 'auto', boxShadow: 'var(--shadow-elevated)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 style={{ marginBottom: 16 }}>{t('credit.newClientTitle')}</h3>
         <form onSubmit={handleSave} style={{ display: 'grid', gap: 10 }}>
           <Input
@@ -77,6 +94,13 @@ export function AddCreditClientModal({ onClose, onCreated }: Props) {
             required
           />
           <PhoneInput placeholder={t('debtorForm.phone') ?? ''} value={phone} onChange={setPhone} />
+          <EmailInput placeholder={t('debtorForm.email') ?? ''} value={email} onChange={setEmail} />
+          <Input
+            placeholder={t('credit.passportData') ?? ''}
+            value={passportData}
+            onChange={(e) => setPassportData(e.target.value)}
+          />
+          <Input placeholder={t('credit.address') ?? ''} value={address} onChange={(e) => setAddress(e.target.value)} />
           <Input
             placeholder={t('debtorForm.comment') ?? ''}
             value={comment}

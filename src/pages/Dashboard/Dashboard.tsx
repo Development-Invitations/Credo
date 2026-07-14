@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Archive as ArchiveIcon, AlertTriangle, BellRing, ChevronRight, ArrowUpDown, Search, Landmark } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { Archive as ArchiveIcon, AlertTriangle, BellRing, ChevronRight, ArrowUpDown, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useApp } from '../../context/AppContext';
 import { useUI } from '../../context/UIContext';
@@ -12,8 +13,6 @@ import { ErrorBanner } from '../../components/ErrorBanner';
 import { Pagination } from '../../components/Pagination';
 import { HelpTooltip } from '../../components/HelpTooltip';
 import { getExchangeRates, convertToBase } from '../../lib/exchangeRates';
-import { CreditsListContent } from '../Credits/CreditsListContent';
-import { useQuickCreateCredit } from '../../components/useQuickCreateCredit';
 
 interface ClientRow {
   id: string;
@@ -66,19 +65,19 @@ function clientStatus(c: ClientWithTotals): Exclude<StatusFilter, 'all'> {
 
 export function Dashboard() {
   const { t } = useTranslation();
-  const { currency, creditModuleEnabled } = useApp();
+  const location = useLocation();
+  const { currency } = useApp();
   const { openRemindersDebtorId, clearOpenReminders, refreshNotifications } = useUI();
-  const [mainTab, setMainTab] = useState<'debtors' | 'credits'>('debtors');
-  const [creditsRefreshKey, setCreditsRefreshKey] = useState(0);
-  const { openPicker: openCreditPicker, modals: creditPickerModals } = useQuickCreateCredit(
-    () => setCreditsRefreshKey((k) => k + 1),
-    currency
-  );
   const [clients, setClients] = useState<ClientWithTotals[]>([]);
   const [upcomingRemindersCount, setUpcomingRemindersCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showAddClient, setShowAddClient] = useState(false);
+
+  useEffect(() => {
+    if ((location.state as any)?.openAdd) setShowAddClient(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [remindersFor, setRemindersFor] = useState<ClientRow | null>(null);
   const [detailClient, setDetailClient] = useState<ClientRow | null>(null);
 
@@ -265,53 +264,9 @@ export function Dashboard() {
           <h1>{t('dashboard.title')}</h1>
           <HelpTooltip text={t('help.dashboard')} />
         </div>
-        {mainTab === 'credits' ? (
-          <Button onClick={openCreditPicker} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Landmark size={16} />
-            {t('credit.createButton')}
-          </Button>
-        ) : (
-          <Button onClick={() => setShowAddClient(true)}>{t('dashboard.addDebtor')}</Button>
-        )}
+        <Button onClick={() => setShowAddClient(true)}>{t('dashboard.addDebtor')}</Button>
       </div>
 
-      {creditModuleEnabled && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
-          <button
-            onClick={() => setMainTab('debtors')}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 20,
-              border: '1px solid var(--color-border)',
-              background: mainTab === 'debtors' ? 'var(--color-accent)' : 'transparent',
-              color: mainTab === 'debtors' ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
-              fontSize: 13,
-              cursor: 'pointer',
-            }}
-          >
-            {t('report.tabDebts')}
-          </button>
-          <button
-            onClick={() => setMainTab('credits')}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 20,
-              border: '1px solid var(--color-border)',
-              background: mainTab === 'credits' ? 'var(--color-accent)' : 'transparent',
-              color: mainTab === 'credits' ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
-              fontSize: 13,
-              cursor: 'pointer',
-            }}
-          >
-            {t('report.tabCredits')}
-          </button>
-        </div>
-      )}
-
-      {mainTab === 'credits' ? (
-        <CreditsListContent refreshKey={creditsRefreshKey} />
-      ) : (
-        <>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
         <div className="card">
           <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>{t('dashboard.kpiTotalDebt')}</div>
@@ -480,8 +435,6 @@ export function Dashboard() {
       </div>
 
       <Pagination page={page} totalPages={totalPages} onChange={setPage} />
-        </>
-      )}
 
       {showAddClient && (
         <AddDebtorModal
@@ -518,8 +471,6 @@ export function Dashboard() {
           }}
         />
       )}
-
-      {creditPickerModals}
     </div>
   );
 }

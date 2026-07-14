@@ -5,6 +5,7 @@ import { LanguageStep } from './pages/Onboarding/LanguageStep';
 import { RegisterStep } from './pages/Onboarding/RegisterStep';
 import { LoginStep } from './pages/Onboarding/LoginStep';
 import { Dashboard } from './pages/Dashboard/Dashboard';
+import { HomePage } from './pages/Home/HomePage';
 import { ArchivePage } from './pages/Archive/ArchivePage';
 import { BlacklistPage } from './pages/Blacklist/BlacklistPage';
 import { RemindersPage } from './pages/Reminders/RemindersPage';
@@ -41,14 +42,22 @@ export default function App() {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : <EntryRoute />} />
-        <Route path="/onboarding" element={session ? <Navigate to="/dashboard" replace /> : <LanguageStep />} />
+        <Route path="/" element={session ? <Navigate to="/home" replace /> : <EntryRoute />} />
+        <Route path="/onboarding" element={session ? <Navigate to="/home" replace /> : <LanguageStep />} />
         <Route
           path="/onboarding/register"
-          element={session ? <Navigate to="/dashboard" replace /> : <RegisterStep />}
+          element={session ? <Navigate to="/home" replace /> : <RegisterStep />}
         />
-        <Route path="/login" element={session ? <Navigate to="/dashboard" replace /> : <LoginStep />} />
+        <Route path="/login" element={session ? <Navigate to="/home" replace /> : <LoginStep />} />
 
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <HomePage />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
