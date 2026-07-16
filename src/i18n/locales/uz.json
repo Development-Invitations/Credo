@@ -335,7 +335,8 @@
     "address": "Manzil",
     "noExtraData": "Qo'shimcha ma'lumot yo'q",
     "creditsHistory": "Kreditlar tarixi",
-    "createdToast": "№{{number}} kredit muvaffaqiyatli rasmiylashtirildi"
+    "createdToast": "№{{number}} kredit muvaffaqiyatli rasmiylashtirildi",
+    "addClientButton": "Mijoz qo'shish"
   },
   "blacklist": {
     "explainer": "Qora ro'yxatdagi mijozlar asosiy qarzdorlar ro'yxatidan yashiriladi. Ularning qarz tarixi o'chirilmaydi — yana ish olib borish uchun mijozni qaytaring.",

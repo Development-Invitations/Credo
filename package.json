@@ -1,6 +1,6 @@
 {
   "name": "debt-tracker",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Приложение учёта должников и напоминаний",
   "main": "electron/main.js",
   "author": "",

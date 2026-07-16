@@ -39,7 +39,7 @@ export function LoginStep() {
     }
 
     rememberEmail(email);
-    navigate('/dashboard');
+    navigate('/home');
   }
 
   if (awaitingConfirmation) {
@@ -49,7 +49,7 @@ export function LoginStep() {
         password={password}
         onConfirmed={() => {
           rememberEmail(email);
-          navigate('/dashboard');
+          navigate('/home');
         }}
         onBack={() => setAwaitingConfirmation(false)}
       />

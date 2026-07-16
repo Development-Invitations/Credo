@@ -44,7 +44,7 @@ export function RegisterStep() {
     if (data.session) {
       // Подтверждение email отключено в проекте — сессия выдаётся сразу.
       rememberEmail(email);
-      navigate('/dashboard');
+      navigate('/home');
       return;
     }
 
@@ -59,7 +59,7 @@ export function RegisterStep() {
         password={password}
         onConfirmed={() => {
           rememberEmail(email);
-          navigate('/dashboard');
+          navigate('/home');
         }}
         onBack={() => setAwaitingConfirmation(false)}
       />

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, AlertTriangle, ArrowUpDown, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
-import { CreditAccordionItem, CreditData } from '../../components/CreditAccordionItem';
+import type { CreditData } from '../../components/CreditAccordionItem';
 import { CreditClientDetailDrawer } from '../../components/CreditClientDetailDrawer';
 import { Pagination } from '../../components/Pagination';
 
@@ -28,11 +28,16 @@ function clientStatus(c: ClientCredits): Exclude<StatusFilter, 'all'> {
   return 'paid';
 }
 
-export function CreditsListContent({ refreshKey }: { refreshKey?: number }) {
+export function CreditsListContent({ refreshKey, openClientId }: { refreshKey?: number; openClientId?: string | null }) {
   const { t } = useTranslation();
   const [clients, setClients] = useState<ClientCredits[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailClientId, setDetailClientId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (openClientId) setDetailClientId(openClientId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openClientId]);
   const [activeTab, setActiveTab] = useState<StatusFilter>('all');
   const [dateSort, setDateSort] = useState<DateSort>('newest');
   const [search, setSearch] = useState('');

@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Phone, Copy, Landmark } from 'lucide-react';
 import { Drawer } from './Drawer';
+import { Button } from './Button';
 import { supabase } from '../lib/supabaseClient';
 import { CreditAccordionItem, CreditData } from './CreditAccordionItem';
+import { CreateCreditModal } from './CreateCreditModal';
+import { useApp } from '../context/AppContext';
 
 interface ClientInfo {
   full_name: string;
@@ -20,9 +24,12 @@ interface Props {
 
 export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props) {
   const { t } = useTranslation();
+  const { currency } = useApp();
   const [client, setClient] = useState<ClientInfo | null>(null);
   const [credits, setCredits] = useState<CreditData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateCredit, setShowCreateCredit] = useState(false);
+  const callingEnabled = localStorage.getItem('callingEnabled') === 'true';
 
   async function load() {
     const { data: clientData } = await supabase
@@ -81,11 +88,48 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
 
   return (
     <Drawer open onClose={onClose} title={client?.full_name ?? ''}>
-      <div className="card" style={{ marginBottom: 16, display: 'grid', gap: 6, fontSize: 13 }}>
+      <div className="card" style={{ marginBottom: 16, display: 'grid', gap: 8, fontSize: 13 }}>
         {client?.phone && (
-          <div>
-            <span style={{ color: 'var(--color-text-muted)' }}>{t('debtorForm.phone')}: </span>
-            {client.phone}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span>{client.phone}</span>
+            {callingEnabled && (
+              <button
+                onClick={() => window.open(`tel:${client.phone!.replace(/\s/g, '')}`)}
+                title={t('clientDetail.call') ?? ''}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'var(--color-accent)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  padding: 4,
+                  borderRadius: 'var(--radius-sm)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Phone size={14} />
+              </button>
+            )}
+            <button
+              onClick={() => navigator.clipboard.writeText(client.phone!)}
+              title={t('clientDetail.copyPhone') ?? ''}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                color: 'var(--color-text-muted)',
+                cursor: 'pointer',
+                display: 'flex',
+                padding: 4,
+                borderRadius: 'var(--radius-sm)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <Copy size={14} />
+            </button>
           </div>
         )}
         {client?.email && (
@@ -111,6 +155,14 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
         )}
       </div>
 
+      <Button
+        onClick={() => setShowCreateCredit(true)}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 20 }}
+      >
+        <Landmark size={16} />
+        {t('credit.createButton')}
+      </Button>
+
       <h3 style={{ fontSize: 14, marginBottom: 10, color: 'var(--color-text-muted)' }}>{t('credit.creditsHistory')}</h3>
 
       {!loading && credits.length === 0 && (
@@ -121,9 +173,18 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
 
       <div style={{ display: 'grid', gap: 8 }}>
         {credits.map((c) => (
-          <CreditAccordionItem key={c.id} credit={c} onChanged={load} />
+          <CreditAccordionItem key={c.id} credit={c} onChanged={load} hideDebtorName />
         ))}
       </div>
+
+      {showCreateCredit && (
+        <CreateCreditModal
+          debtorId={clientId}
+          defaultCurrency={currency}
+          onClose={() => setShowCreateCredit(false)}
+          onCreated={load}
+        />
+      )}
     </Drawer>
   );
 }

@@ -72,7 +72,7 @@ export function HomePage() {
       { key: 'addDebtor', label: t('dashboard.addDebtor'), icon: Users, onClick: () => navigate('/dashboard', { state: { openAdd: true } }) },
     ];
     if (creditModuleEnabled) {
-      actions.push({ key: 'addCredit', label: t('credit.createButton'), icon: Landmark, onClick: () => navigate('/credits', { state: { openAdd: true } }) });
+      actions.push({ key: 'addCredit', label: t('credit.addClientButton'), icon: Landmark, onClick: () => navigate('/credits', { state: { openAdd: true } }) });
     }
     actions.push({ key: 'reminders', label: t('sidebar.reminders'), icon: BellRing, onClick: () => navigate('/reminders') });
     actions.push({ key: 'report', label: t('sidebar.report'), icon: BarChart3, onClick: () => navigate('/reports') });

@@ -36,6 +36,7 @@ export interface CreditData {
 interface Props {
   credit: CreditData;
   onChanged: () => void;
+  hideDebtorName?: boolean;
 }
 
 type ConfirmAction =
@@ -43,7 +44,7 @@ type ConfirmAction =
   | { type: 'undo'; item: CreditPayment }
   | { type: 'early'; items: CreditPayment[] };
 
-export function CreditAccordionItem({ credit: c, onChanged }: Props) {
+export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [periodCount, setPeriodCount] = useState('1');
@@ -118,29 +119,35 @@ export function CreditAccordionItem({ credit: c, onChanged }: Props) {
           cursor: 'pointer',
           color: 'var(--color-text)',
           textAlign: 'left',
+          gap: 10,
         }}
       >
-        <div>
-          <div style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-            {overdue && <AlertTriangle size={14} color="var(--color-danger)" />}
-            {c.debtor_name}
+        <div style={{ minWidth: 0, flex: 1 }}>
+          {!hideDebtorName && (
+            <div style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+              {overdue && <AlertTriangle size={14} color="var(--color-danger)" />}
+              {c.debtor_name}
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+            {hideDebtorName && overdue && <AlertTriangle size={14} color="var(--color-danger)" />}
+            <span className="amount" style={{ fontSize: 15 }}>
+              {Number(c.principal_amount).toLocaleString()} {c.currency}
+            </span>
+            <span style={{ fontSize: 12, color: overdue ? 'var(--color-danger)' : 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+              {paidCount}/{c.payments.length}
+            </span>
           </div>
-          <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+          <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
             {c.credit_number ? `№${c.credit_number} · ` : ''}
-            {c.account_number ? `${c.account_number} · ` : ''}
             {t(`credit.interest_${c.interest_type}`)}
             {c.interest_type !== 'none' ? ` · ${c.interest_rate}%` : ''} · {c.term_months} {t('credit.months')}
-          </span>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span className="amount" style={{ fontSize: 14 }}>
-            {Number(c.principal_amount).toLocaleString()} {c.currency}
-          </span>
-          <span style={{ fontSize: 12, color: overdue ? 'var(--color-danger)' : 'var(--color-text-muted)' }}>
-            {paidCount}/{c.payments.length}
-          </span>
-          <ChevronDown size={16} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
-        </div>
+        <ChevronDown
+          size={16}
+          style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }}
+        />
       </button>
 
       {open && (
@@ -222,11 +229,22 @@ export function CreditAccordionItem({ credit: c, onChanged }: Props) {
           {c.events.length > 0 && (
             <>
               <h4 style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 8px' }}>{t('credit.eventsTitle')}</h4>
-              <div style={{ display: 'grid', gap: 4 }}>
+              <div style={{ display: 'grid', gap: 6 }}>
                 {c.events.map((ev) => (
-                  <div key={ev.id} style={{ fontSize: 12, color: 'var(--color-text-muted)', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>{ev.description}</span>
-                    <span>{new Date(ev.created_at).toLocaleString()}</span>
+                  <div
+                    key={ev.id}
+                    style={{
+                      fontSize: 12,
+                      color: 'var(--color-text)',
+                      background: 'var(--color-surface-hover)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '8px 10px',
+                    }}
+                  >
+                    <div>{ev.description}</div>
+                    <div style={{ color: 'var(--color-text-muted)', fontSize: 11, marginTop: 2 }}>
+                      {new Date(ev.created_at).toLocaleString()}
+                    </div>
                   </div>
                 ))}
               </div>

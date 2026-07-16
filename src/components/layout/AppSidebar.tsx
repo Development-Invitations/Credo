@@ -24,7 +24,7 @@ export function AppSidebar() {
   return (
     <aside
       style={{
-        width: 220,
+        width: 240,
         flexShrink: 0,
         borderRight: '1px solid var(--color-border)',
         background: 'var(--color-bg-elevated)',
@@ -42,16 +42,16 @@ export function AppSidebar() {
         <Users size={18} />
         {t('sidebar.debtors')}
       </NavLink>
-      <NavLink to="/reminders" style={({ isActive }) => navItemStyle(isActive)}>
-        <BellRing size={18} />
-        {t('sidebar.reminders')}
-      </NavLink>
       {creditModuleEnabled && (
         <NavLink to="/credits" style={({ isActive }) => navItemStyle(isActive)}>
           <Landmark size={18} />
           {t('sidebar.credits')}
         </NavLink>
       )}
+      <NavLink to="/reminders" style={({ isActive }) => navItemStyle(isActive)}>
+        <BellRing size={18} />
+        {t('sidebar.reminders')}
+      </NavLink>
       {soundModuleEnabled && (
         <NavLink to="/sound" style={({ isActive }) => navItemStyle(isActive)}>
           <Volume2 size={18} />
