@@ -77,8 +77,8 @@ export function AddDebtorModal({ onClose, onCreated }: Props) {
             onChange={(e) => setFullName(e.target.value)}
             required
           />
-          <PhoneInput placeholder={t('debtorForm.phone') ?? ''} value={phone} onChange={setPhone} />
-          <EmailInput placeholder={t('debtorForm.email') ?? ''} value={email} onChange={setEmail} />
+          <PhoneInput placeholder={t('debtorForm.phone') ?? ''} value={phone} onChange={setPhone} required />
+          <EmailInput placeholder={t('debtorForm.email') ?? ''} value={email} onChange={setEmail} required />
           <Input
             placeholder={t('debtorForm.comment') ?? ''}
             value={comment}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, CheckCircle2, Circle, AlertTriangle, Undo2, Zap, Printer } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Circle, AlertTriangle, Undo2, Zap, Printer, X } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useApp } from '../context/AppContext';
 import { Button } from './Button';
@@ -149,16 +149,65 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
             {c.interest_type !== 'none' ? ` · ${c.interest_rate}%` : ''} · {c.term_months} {t('credit.months')}
           </div>
         </div>
-        <ChevronDown
-          size={16}
-          style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }}
-        />
+        <ChevronRight size={16} style={{ flexShrink: 0 }} />
       </button>
 
       {open && (
-        <div style={{ padding: '0 16px 16px', borderTop: '1px solid var(--color-border)' }}>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 160,
+          }}
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="card"
+            style={{ width: 440, maxHeight: '85vh', overflowY: 'auto', boxShadow: 'var(--shadow-elevated)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+              <div>
+                <div className="amount" style={{ fontSize: 22, fontWeight: 700 }}>
+                  {Number(c.principal_amount).toLocaleString()} {c.currency}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 6 }}>
+                  {c.credit_number ? `№${c.credit_number} · ` : ''}
+                  {t(`credit.interest_${c.interest_type}`)}
+                  {c.interest_type !== 'none' ? ` · ${c.interest_rate}%` : ''} · {c.term_months} {t('credit.months')}
+                </div>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    marginTop: 8,
+                    fontSize: 12,
+                    padding: '2px 8px',
+                    borderRadius: 20,
+                    background: overdue ? 'var(--color-danger)' : unconfirmed.length > 0 ? 'var(--color-accent)' : 'var(--color-success)',
+                    color: '#fff',
+                  }}
+                >
+                  {overdue
+                    ? t('dashboard.statusOverdue')
+                    : unconfirmed.length > 0
+                    ? t('dashboard.statusActive')
+                    : t('dashboard.statusPaid')}
+                </span>
+              </div>
+              <button
+                onClick={() => setOpen(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 4, display: 'flex' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
           {unconfirmed.length > 0 && (
-            <div style={{ margin: '14px 0', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ margin: '0 0 14px', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{t('credit.periodLabel')}</span>
               <Input
                 type="number"
@@ -197,7 +246,7 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
           )}
 
           {documentsModuleEnabled && (
-            <div style={{ margin: unconfirmed.length > 0 ? '0 0 14px' : '14px 0' }}>
+            <div style={{ margin: unconfirmed.length > 0 ? '0 0 14px' : '0 0 14px' }}>
               <Button
                 variant="secondary"
                 onClick={() => setShowPrint(true)}
@@ -270,6 +319,7 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
               </div>
             </>
           )}
+          </div>
         </div>
       )}
 
@@ -401,6 +451,7 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
             companyName: localStorage.getItem('docCompanyName') || '',
             companyDetails: localStorage.getItem('docCompanyDetails') || '',
           }}
+          schedule={sorted}
           onClose={() => setShowPrint(false)}
         />
       )}

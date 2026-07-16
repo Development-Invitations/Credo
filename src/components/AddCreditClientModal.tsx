@@ -5,6 +5,7 @@ import { friendlyErrorMessage, logError } from '../lib/errorLog';
 import { Button } from './Button';
 import { Input } from './Input';
 import { PhoneInput } from './PhoneInput';
+import { PassportInput } from './PassportInput';
 import { EmailInput } from './EmailInput';
 import { ErrorBanner } from './ErrorBanner';
 
@@ -18,6 +19,7 @@ interface Props {
 export function AddCreditClientModal({ onClose, onCreated }: Props) {
   const { t } = useTranslation();
   const [fullName, setFullName] = useState('');
+  const [country, setCountry] = useState(localStorage.getItem('docsCountry') || 'uz');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [passportData, setPassportData] = useState('');
@@ -93,13 +95,19 @@ export function AddCreditClientModal({ onClose, onCreated }: Props) {
             onChange={(e) => setFullName(e.target.value)}
             required
           />
-          <PhoneInput placeholder={t('debtorForm.phone') ?? ''} value={phone} onChange={setPhone} />
-          <EmailInput placeholder={t('debtorForm.email') ?? ''} value={email} onChange={setEmail} />
-          <Input
-            placeholder={t('credit.passportData') ?? ''}
-            value={passportData}
-            onChange={(e) => setPassportData(e.target.value)}
+          <PhoneInput
+            placeholder={t('debtorForm.phone') ?? ''}
+            value={phone}
+            onChange={setPhone}
+            required
+            country={country}
+            onCountryChange={(c) => {
+              setCountry(c);
+              localStorage.setItem('docsCountry', c);
+            }}
           />
+          <EmailInput placeholder={t('debtorForm.email') ?? ''} value={email} onChange={setEmail} required />
+          <PassportInput value={passportData} onChange={setPassportData} country={country} required />
           <Input placeholder={t('credit.address') ?? ''} value={address} onChange={(e) => setAddress(e.target.value)} />
           <Input
             placeholder={t('debtorForm.comment') ?? ''}

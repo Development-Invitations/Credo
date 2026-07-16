@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabaseClient';
 import { SUPPORTED_LANGUAGES } from '../i18n';
 import { CURRENCIES } from '../lib/currency';
 import { THEMES } from '../lib/themes';
-import { History, X } from 'lucide-react';
+import { History, X, ChevronDown } from 'lucide-react';
 import { Checkbox } from './Checkbox';
 import { Button } from './Button';
 import { SettingsRow } from './SettingsRow';
@@ -47,10 +47,21 @@ export function SettingsPanelContent() {
   const [currencyPrompt, setCurrencyPrompt] = useState<{ lang: string; suggested: string } | null>(null);
   const [showChangelog, setShowChangelog] = useState(false);
   const [changelog, setChangelog] = useState<{ version: string; released_at: string; release_notes: string | null }[]>([]);
+  const [expandedVersions, setExpandedVersions] = useState<Set<number>>(new Set([0]));
+
+  function toggleVersion(i: number) {
+    setExpandedVersions((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  }
 
   async function openChangelog() {
     setShowChangelog(true);
     markUpdateSeen();
+    setExpandedVersions(new Set([0]));
     const { data } = await supabase
       .from('app_versions')
       .select('version, released_at, release_notes')
@@ -338,14 +349,16 @@ export function SettingsPanelContent() {
               {changelog.map((v, i) => (
                 <div
                   key={i}
+                  onClick={() => toggleVersion(i)}
                   style={{
                     background: 'var(--color-surface-hover)',
                     borderRadius: 'var(--radius-md)',
                     padding: '12px 14px',
                     border: i === 0 ? '1px solid var(--color-accent)' : '1px solid transparent',
+                    cursor: 'pointer',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: expandedVersions.has(i) ? 6 : 0 }}>
                     <span style={{ fontWeight: 700, fontSize: 13, color: i === 0 ? 'var(--color-accent)' : 'var(--color-text)' }}>
                       v{v.version}
                       {i === 0 && (
@@ -364,11 +377,18 @@ export function SettingsPanelContent() {
                         </span>
                       )}
                     </span>
-                    <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
-                      {new Date(v.released_at).toLocaleDateString()}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+                        {new Date(v.released_at).toLocaleDateString()}
+                      </span>
+                      <ChevronDown
+                        size={14}
+                        color="var(--color-text-muted)"
+                        style={{ transform: expandedVersions.has(i) ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }}
+                      />
+                    </div>
                   </div>
-                  {v.release_notes && (
+                  {expandedVersions.has(i) && v.release_notes && (
                     <div style={{ fontSize: 12, color: 'var(--color-text-muted)', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
                       {v.release_notes}
                     </div>

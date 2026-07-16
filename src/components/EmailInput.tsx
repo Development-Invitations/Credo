@@ -7,9 +7,10 @@ interface Props {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  required?: boolean;
 }
 
-export function EmailInput({ value, onChange, placeholder }: Props) {
+export function EmailInput({ value, onChange, placeholder, required }: Props) {
   const [focused, setFocused] = useState(false);
 
   const atIndex = value.indexOf('@');
@@ -28,6 +29,7 @@ export function EmailInput({ value, onChange, placeholder }: Props) {
       <Input
         type="email"
         inputMode="email"
+        required={required}
         placeholder={placeholder || 'test@gmail.com'}
         value={value}
         onChange={(e) => onChange(e.target.value.trim().toLowerCase())}

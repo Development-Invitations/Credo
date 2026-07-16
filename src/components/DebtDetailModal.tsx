@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, RotateCcw, X, Printer } from 'lucide-react';
+import { CheckCircle2, RotateCcw, X, Printer, Coins } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useToast } from '../context/ToastContext';
 import { useApp } from '../context/AppContext';
@@ -176,7 +176,12 @@ export function DebtDetailModal({ debt, clientId, readOnly, onClose, onChanged }
         {!readOnly && (
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
             {debt.status === 'active' && (
-              <Button variant="secondary" onClick={() => setShowPartial((v) => !v)} style={{ flex: 1 }}>
+              <Button
+                variant="secondary"
+                onClick={() => setShowPartial((v) => !v)}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              >
+                <Coins size={15} />
                 {t('clientDetail.partialPayment')}
               </Button>
             )}
