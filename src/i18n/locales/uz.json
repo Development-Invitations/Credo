@@ -136,7 +136,9 @@
     "emailFromName": "Jo'natuvchi nomi",
     "smsDaysBeforeLabel": "Muddatdan necha kun oldin eslatish",
     "smsDaysBeforeCount": "{{count}} kun",
-    "smsDaysBeforeHint": "SMS uchun ham, pochta xatlari uchun ham qo'llaniladi — pastda qaysi kanal tanlanganidan qat'i nazar. Qarzlar va kreditlar uchun bir xil ishlaydi."
+    "smsDaysBeforeHint": "SMS uchun ham, pochta xatlari uchun ham qo'llaniladi — pastda qaysi kanal tanlanganidan qat'i nazar. Qarzlar va kreditlar uchun bir xil ishlaydi.",
+    "documentsToggle": "«Hujjatlar» moduli",
+    "documentsHint": "Qarzlar va kreditlar bo'yicha shartnoma chop etish uchun yoqing. Shablonlar, rekvizitlar va muhrni sozlash — chapdagi menyudagi «Hujjatlar» bo'limida."
   },
   "errors": {
     "generic": "Nimadir xato ketdi. Qayta urinib ko'ring.",
@@ -172,7 +174,8 @@
     "calling": "Telefoniya",
     "sms": "SMS-xabarnoma",
     "blacklist": "Qora ro'yxat",
-    "home": "Bosh sahifa"
+    "home": "Bosh sahifa",
+    "documents": "Hujjatlar"
   },
   "notifications": {
     "title": "Bildirishnomalar",
@@ -232,12 +235,16 @@
     "currentlyOverdue": "Hozir muddati o'tgan",
     "paidLate": "Kechikib to'langan",
     "onTime": "O'z vaqtida to'langan",
-    "exportCsv": "CSV'ga eksport",
+    "exportCsv": "Excel'ga eksport",
     "rangeAll": "Butun davr",
     "rangeMonth": "Shu oy",
     "range30days": "Oxirgi 30 kun",
     "tabDebts": "Qarzlar",
-    "tabCredits": "Kreditlar"
+    "tabCredits": "Kreditlar",
+    "colAmount": "Summa",
+    "colCurrency": "Valyuta",
+    "colRemaining": "Qoldiq",
+    "colStatus": "Holati"
   },
   "profile": {
     "title": "Shaxsiy kabinet",
@@ -284,7 +291,8 @@
     "calling": "Haqiqiy qo'ng'iroq xizmatini (SIP-provayder va h.k.) ulash uchun sozlamalar. Hozircha bu shunchaki forma — qo'ng'iroq yuborish provayder ulangandan keyin ishlaydi.",
     "sms": "Qarzlar va kreditlar uchun alohida shablonlar bilan SMS yoki pochta orqali eslatma yuborishni sozlang. Haqiqiy yuborish provayder ulangandan keyin ishlaydi.",
     "blacklist": "Bu yerga yuborilgan mijozlar endi oddiy qarzdorlar ro'yxatida ko'rinmaydi. Pastdagi tugma bilan qaytarish mumkin.",
-    "home": "Asosiy amallarga tezkor kirish va pul bo'yicha umumiy manzara — bu oyda qarzlar va kreditlar bo'yicha qancha yig'ilgani, hamda foiz bo'yicha kutilayotgan foyda."
+    "home": "Asosiy amallarga tezkor kirish va pul bo'yicha umumiy manzara — bu oyda qarzlar va kreditlar bo'yicha qancha yig'ilgani, hamda foiz bo'yicha kutilayotgan foyda.",
+    "documents": "Bu yerda chop etish uchun shartnoma shablonlari sozlanadi — qarzlar va kreditlar uchun alohida, sizning rekvizitlaringiz va muhr/imzo bilan."
   },
   "credit": {
     "createButton": "Kredit rasmiylashtirish",
@@ -336,7 +344,11 @@
     "noExtraData": "Qo'shimcha ma'lumot yo'q",
     "creditsHistory": "Kreditlar tarixi",
     "createdToast": "№{{number}} kredit muvaffaqiyatli rasmiylashtirildi",
-    "addClientButton": "Mijoz qo'shish"
+    "addClientButton": "Mijoz qo'shish",
+    "paymentDetailTitle": "Jadval bo'yicha to'lov",
+    "statusLabel": "Holati",
+    "confirmedStatus": "Tasdiqlangan",
+    "unconfirmedStatus": "To'lovni kutmoqda"
   },
   "blacklist": {
     "explainer": "Qora ro'yxatdagi mijozlar asosiy qarzdorlar ro'yxatidan yashiriladi. Ularning qarz tarixi o'chirilmaydi — yana ish olib borish uchun mijozni qaytaring.",
@@ -356,5 +368,31 @@
     "creditsCollectedHint": "Joriy oy boshidan beri kreditlar bo'yicha tasdiqlangan to'lovlar yig'indisi.",
     "creditsProfit": "Kreditlar bo'yicha kutilayotgan foyda",
     "creditsProfitHint": "Jadval bo'yicha qaytariladigan to'liq summa (tan narx + foizlar) bilan berilgan summa o'rtasidagi farq — barcha kreditlar bo'yicha. Bu oy uchun emas, balki kreditlarning butun davri uchun umumiy manzara."
+  },
+  "debtDetail": {
+    "takenOn": "Olingan",
+    "dueDate": "Muddat",
+    "paidSoFarLabel": "To'langan",
+    "remaining": "Qoldiq",
+    "paymentsHistory": "To'lovlar tarixi",
+    "noPayments": "Hozircha to'lovlar bo'lmagan"
+  },
+  "documents": {
+    "companySection": "Sizning rekvizitlaringiz",
+    "companyName": "Qarz beruvchi nomi / F.I.Sh.",
+    "companyDetails": "Rekvizitlar (manzil, STIR va h.k.)",
+    "city": "Shahar (hujjat sarlavhasi uchun)",
+    "stampSection": "Muhr / imzo",
+    "stampHint": "Muhr yoki imzo rasmini yuklang — u qarz beruvchi tomonidan hujjatga avtomatik qo'shiladi.",
+    "uploadStamp": "Rasm yuklash",
+    "removeStamp": "O'chirish",
+    "debtTemplateTitle": "Tilxat shabloni (qarz)",
+    "creditTemplateTitle": "Kredit shartnomasi shabloni",
+    "variablesHint": "Mavjud o'zgaruvchilar: {{number}}, {{city}}, {{date}}, {{amount}}, {{currency}}, {{takenDate}}, {{dueDate}}, {{comment}}, {{companyName}}, {{companyDetails}}, {{interestType}}, {{rate}}, {{term}}, {{monthlyPayment}}, {{passport}}, {{address}}, {{phone}}. Qabul qiluvchining ismi va imzosi doim bo'sh qoladi — qo'lda to'ldiriladi.",
+    "sampleCompanyName": "«Sizning kompaniyangiz» MChJ",
+    "sampleCompanyDetails": "Toshkent sh., Namunaviy ko'chasi, 1",
+    "close": "Yopish",
+    "printButton": "Chop etish",
+    "printContractButton": "Shartnomani chop etish"
   }
 }

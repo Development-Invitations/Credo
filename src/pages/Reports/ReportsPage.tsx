@@ -9,6 +9,7 @@ import { HelpTooltip } from '../../components/HelpTooltip';
 import { Button } from '../../components/Button';
 import { ClientReportRow, DebtWithPayments, ReminderRow } from '../../components/ClientReportRow';
 import { CreditAccordionItem, CreditData } from '../../components/CreditAccordionItem';
+import { exportToExcel } from '../../lib/exportExcel';
 
 interface ClientEntry {
   id: string;
@@ -220,52 +221,69 @@ export function ReportsPage() {
   }, [credits]);
 
   function exportCsv() {
-    const rows: string[] = ['Клиент,Сумма,Валюта,Остаток,Срок,Статус,Комментарий,Дата создания'];
-    for (const c of clients) {
-      for (const d of c.debts) {
-        const remaining = Math.max(Number(d.amount) - Number(d.paid_amount || 0), 0);
-        rows.push(
-          [c.full_name, d.amount, d.currency, remaining, d.due_date ?? '', d.status, (d.comment ?? '').replace(/,/g, ';'), new Date(d.created_at).toLocaleDateString()].join(',')
-        );
-      }
-    }
-    const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `credo-report-dolgi-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const rows = clients.flatMap((c) =>
+      c.debts.map((d) => ({
+        client: c.full_name,
+        amount: Number(d.amount),
+        currency: d.currency,
+        remaining: Math.max(Number(d.amount) - Number(d.paid_amount || 0), 0),
+        due_date: d.due_date ?? '',
+        status: d.status === 'active' ? t('dashboard.statusActive') : t('dashboard.statusPaid'),
+        comment: d.comment ?? '',
+        created_at: new Date(d.created_at).toLocaleDateString(),
+      }))
+    );
+    exportToExcel(
+      rows,
+      [
+        { header: t('sidebar.debtors') as string, key: 'client', width: 22 },
+        { header: t('report.colAmount') as string, key: 'amount', width: 14 },
+        { header: t('report.colCurrency') as string, key: 'currency', width: 10 },
+        { header: t('report.colRemaining') as string, key: 'remaining', width: 14 },
+        { header: t('debtDetail.dueDate') as string, key: 'due_date', width: 14 },
+        { header: t('report.colStatus') as string, key: 'status', width: 14 },
+        { header: t('debtorForm.comment') as string, key: 'comment', width: 24 },
+        { header: t('debtDetail.takenOn') as string, key: 'created_at', width: 14 },
+      ],
+      t('report.tabDebts') as string,
+      `credo-report-dolgi-${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
   }
 
   function exportCreditsCsv() {
-    const rows: string[] = ['Клиент,Лицевой счёт,Сумма кредита,Валюта,Тип процента,Ставка,Срок (мес),Дата платежа,Ожидаемая сумма,Подтверждён,Оплачено'];
-    for (const c of credits) {
-      for (const p of c.payments) {
-        rows.push(
-          [
-            c.debtor_name,
-            c.account_number ?? '',
-            c.principal_amount,
-            c.currency,
-            c.interest_type,
-            c.interest_rate,
-            c.term_months,
-            new Date(p.due_date).toLocaleDateString(),
-            p.expected_amount,
-            p.is_confirmed ? 'да' : 'нет',
-            p.paid_amount,
-          ].join(',')
-        );
-      }
-    }
-    const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `credo-report-krediti-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const rows = credits.flatMap((c) =>
+      c.payments.map((p) => ({
+        client: c.debtor_name,
+        creditNumber: c.credit_number ?? '',
+        principal: Number(c.principal_amount),
+        currency: c.currency,
+        interestType: t(`credit.interest_${c.interest_type}`),
+        rate: c.interest_rate,
+        term: c.term_months,
+        dueDate: new Date(p.due_date).toLocaleDateString(),
+        expected: Number(p.expected_amount),
+        confirmed: p.is_confirmed ? t('credit.confirmedStatus') : t('credit.unconfirmedStatus'),
+        paid: Number(p.paid_amount),
+      }))
+    );
+    exportToExcel(
+      rows,
+      [
+        { header: t('sidebar.credits') as string, key: 'client', width: 22 },
+        { header: '№', key: 'creditNumber', width: 12 },
+        { header: t('credit.principal') as string, key: 'principal', width: 14 },
+        { header: t('report.colCurrency') as string, key: 'currency', width: 10 },
+        { header: t('credit.interestType') as string, key: 'interestType', width: 18 },
+        { header: t('credit.rate') as string, key: 'rate', width: 10 },
+        { header: t('credit.termMonths') as string, key: 'term', width: 10 },
+        { header: t('debtDetail.dueDate') as string, key: 'dueDate', width: 14 },
+        { header: t('credit.totalLabel') as string, key: 'expected', width: 14 },
+        { header: t('credit.statusLabel') as string, key: 'confirmed', width: 16 },
+        { header: t('debtDetail.paidSoFarLabel') as string, key: 'paid', width: 14 },
+      ],
+      t('report.tabCredits') as string,
+      `credo-report-krediti-${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
   }
 
   const rangeButtons: { key: DateRange; label: string }[] = [

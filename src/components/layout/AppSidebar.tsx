@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { Users, Archive, BellRing, BarChart3, Landmark, Volume2, Phone, MessageSquare, ShieldOff, Home } from 'lucide-react';
+import { Users, Archive, BellRing, BarChart3, Landmark, Volume2, Phone, MessageSquare, ShieldOff, Home, FileText } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 const navItemStyle = (isActive: boolean): React.CSSProperties => ({
@@ -19,7 +19,7 @@ const navItemStyle = (isActive: boolean): React.CSSProperties => ({
 
 export function AppSidebar() {
   const { t } = useTranslation();
-  const { creditModuleEnabled, soundModuleEnabled, callingModuleEnabled, smsModuleEnabled } = useApp();
+  const { creditModuleEnabled, soundModuleEnabled, callingModuleEnabled, smsModuleEnabled, documentsModuleEnabled } = useApp();
 
   return (
     <aside
@@ -68,6 +68,12 @@ export function AppSidebar() {
         <NavLink to="/sms" style={({ isActive }) => navItemStyle(isActive)}>
           <MessageSquare size={18} />
           {t('sidebar.sms')}
+        </NavLink>
+      )}
+      {documentsModuleEnabled && (
+        <NavLink to="/documents" style={({ isActive }) => navItemStyle(isActive)}>
+          <FileText size={18} />
+          {t('sidebar.documents')}
         </NavLink>
       )}
       <NavLink to="/archive" style={({ isActive }) => navItemStyle(isActive)}>

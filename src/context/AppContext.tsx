@@ -25,6 +25,8 @@ interface AppContextValue {
   setCallingModuleEnabled: (v: boolean) => void;
   smsModuleEnabled: boolean;
   setSmsModuleEnabled: (v: boolean) => void;
+  documentsModuleEnabled: boolean;
+  setDocumentsModuleEnabled: (v: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -52,6 +54,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
   const [smsModuleEnabled, setSmsModuleEnabledState] = useState(
     localStorage.getItem('smsEnabled') === 'true'
+  );
+  const [documentsModuleEnabled, setDocumentsModuleEnabledState] = useState(
+    localStorage.getItem('documentsModuleEnabled') === 'true'
   );
 
   // Восстановление сессии при запуске (авто-вход, если пользователь уже входил ранее)
@@ -111,6 +116,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSmsModuleEnabled: (v: boolean) => {
           setSmsModuleEnabledState(v);
           localStorage.setItem('smsEnabled', v ? 'true' : 'false');
+        },
+        documentsModuleEnabled,
+        setDocumentsModuleEnabled: (v: boolean) => {
+          setDocumentsModuleEnabledState(v);
+          localStorage.setItem('documentsModuleEnabled', v ? 'true' : 'false');
         },
       }}
     >

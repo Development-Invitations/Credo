@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Phone, Copy, Landmark } from 'lucide-react';
+import { Phone, Copy, Landmark, Mail, FileText, MapPin } from 'lucide-react';
 import { Drawer } from './Drawer';
 import { Button } from './Button';
 import { supabase } from '../lib/supabaseClient';
@@ -91,6 +91,7 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
       <div className="card" style={{ marginBottom: 16, display: 'grid', gap: 8, fontSize: 13 }}>
         {client?.phone && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Phone size={14} color="var(--color-text-muted)" />
             <span>{client.phone}</span>
             {callingEnabled && (
               <button
@@ -133,20 +134,20 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
           </div>
         )}
         {client?.email && (
-          <div>
-            <span style={{ color: 'var(--color-text-muted)' }}>{t('debtorForm.email')}: </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Mail size={14} color="var(--color-text-muted)" />
             {client.email}
           </div>
         )}
         {client?.passport_data && (
-          <div>
-            <span style={{ color: 'var(--color-text-muted)' }}>{t('credit.passportData')}: </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FileText size={14} color="var(--color-text-muted)" />
             {client.passport_data}
           </div>
         )}
         {client?.address && (
-          <div>
-            <span style={{ color: 'var(--color-text-muted)' }}>{t('credit.address')}: </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <MapPin size={14} color="var(--color-text-muted)" />
             {client.address}
           </div>
         )}

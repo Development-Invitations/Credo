@@ -13,33 +13,41 @@ export function parseAmount(display: string): number {
 }
 
 /**
- * Простая универсальная маска телефона под формат стран СНГ: "+998 90 123 45 67".
- * Не привязана к одной стране — просто группирует цифры после кода в блоки 2-3-2-2,
- * что покрывает большинство номеров региона (UZ/RU/TJ/KZ/KG).
+ * Маски телефона под конкретные страны — по выбранному языку интерфейса.
+ * '9' в шаблоне — место для цифры, остальные символы выводятся как есть.
  */
-export function formatPhoneDisplay(raw: string): string {
-  let digits = raw.replace(/[^\d+]/g, '');
-  const hasPlus = digits.startsWith('+');
-  digits = digits.replace(/\+/g, '');
-  if (hasPlus) digits = digits;
+export const PHONE_MASK_TEMPLATES: Record<string, string> = {
+  ru: '+7 (999) 999-99-99',
+  uz: '+998 (99) 999-99-99',
+  tj: '+992 (99) 999-99-99',
+  kz: '+7 (999) 999-99-99',
+  kg: '+996 (999) 999-999',
+};
 
-  digits = digits.slice(0, 15);
+export function phoneExample(lang: string): string {
+  return PHONE_MASK_TEMPLATES[lang] ?? PHONE_MASK_TEMPLATES.ru;
+}
 
-  // код страны — первые 1-3 цифры (эвристика: 1 если начинается на 7, иначе 3)
-  const ccLen = digits.startsWith('7') ? 1 : 3;
-  const cc = digits.slice(0, ccLen);
-  const rest = digits.slice(ccLen);
+/** Форматирует телефон под маску текущего языка интерфейса, по мере набора цифр. */
+export function formatPhoneDisplay(raw: string, lang: string = 'ru'): string {
+  if (!raw || !raw.trim()) return '';
 
-  const groups = [];
-  let i = 0;
-  const pattern = [2, 3, 2, 2];
-  for (const len of pattern) {
-    if (i >= rest.length) break;
-    groups.push(rest.slice(i, i + len));
-    i += len;
+  const template = PHONE_MASK_TEMPLATES[lang] ?? PHONE_MASK_TEMPLATES.ru;
+  const prefixDigits = template.split('(')[0].replace(/\D/g, ''); // код страны, например "998"
+
+  let digits = raw.replace(/\D/g, '');
+  if (digits.startsWith(prefixDigits)) digits = digits.slice(prefixDigits.length);
+
+  let result = '';
+  let di = 0;
+  for (const ch of template) {
+    if (ch === '9') {
+      if (di >= digits.length) break;
+      result += digits[di];
+      di++;
+    } else {
+      result += ch;
+    }
   }
-  if (i < rest.length) groups.push(rest.slice(i));
-
-  const body = groups.filter(Boolean).join(' ');
-  return `${hasPlus || digits.length > 0 ? '+' : ''}${cc}${body ? ' ' + body : ''}`.trim();
+  return result;
 }

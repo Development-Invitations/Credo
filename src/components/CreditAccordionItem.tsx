@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, CheckCircle2, Circle, AlertTriangle, Undo2, Zap } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Circle, AlertTriangle, Undo2, Zap, Printer } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useApp } from '../context/AppContext';
 import { Button } from './Button';
 import { Input } from './Input';
+import { ContractPrintView } from './ContractPrintView';
 
 export interface CreditPayment {
   id: string;
@@ -46,9 +48,12 @@ type ConfirmAction =
 
 export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Props) {
   const { t } = useTranslation();
+  const { documentsModuleEnabled } = useApp();
+  const [showPrint, setShowPrint] = useState(false);
   const [open, setOpen] = useState(false);
   const [periodCount, setPeriodCount] = useState('1');
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
+  const [viewPayment, setViewPayment] = useState<CreditPayment | null>(null);
   const [busy, setBusy] = useState(false);
 
   const sorted = [...c.payments].sort((a, b) => a.due_date.localeCompare(b.due_date));
@@ -191,6 +196,19 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
             </div>
           )}
 
+          {documentsModuleEnabled && (
+            <div style={{ margin: unconfirmed.length > 0 ? '0 0 14px' : '14px 0' }}>
+              <Button
+                variant="secondary"
+                onClick={() => setShowPrint(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <Printer size={15} />
+                {t('documents.printContractButton')}
+              </Button>
+            </div>
+          )}
+
           <h4 style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 8px' }}>{t('credit.scheduleTitle')}</h4>
           <div style={{ display: 'grid', gap: 6, marginBottom: 14 }}>
             {sorted.map((p) => {
@@ -198,6 +216,7 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
               return (
                 <div
                   key={p.id}
+                  onClick={() => setViewPayment(p)}
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -206,6 +225,7 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
                     borderRadius: 'var(--radius-sm)',
                     background: 'var(--color-surface-hover)',
                     opacity: p.is_confirmed ? 0.6 : 1,
+                    cursor: 'pointer',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -250,6 +270,57 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {viewPayment && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 195,
+          }}
+          onClick={() => setViewPayment(null)}
+        >
+          <div className="card" style={{ maxWidth: 360, boxShadow: 'var(--shadow-elevated)' }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: 12 }}>{t('credit.paymentDetailTitle')}</h3>
+            <div className="card" style={{ background: 'var(--color-surface-hover)', display: 'grid', gap: 6, fontSize: 13, marginBottom: 16 }}>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>{t('debtDetail.dueDate')}: </span>
+                {new Date(viewPayment.due_date).toLocaleDateString()}
+              </div>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>{t('credit.totalLabel')}: </span>
+                <span className="amount">
+                  {Number(viewPayment.expected_amount).toLocaleString()} {c.currency}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>{t('credit.statusLabel')}: </span>
+                <span style={{ color: viewPayment.is_confirmed ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
+                  {viewPayment.is_confirmed ? t('credit.confirmedStatus') : t('credit.unconfirmedStatus')}
+                </span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setViewPayment(null)}>
+                {t('debtorForm.cancel')}
+              </Button>
+              <Button
+                onClick={() => {
+                  const p = viewPayment;
+                  setViewPayment(null);
+                  setConfirmAction(p.is_confirmed ? { type: 'undo', item: p } : { type: 'pay', items: [p] });
+                }}
+              >
+                {viewPayment.is_confirmed ? t('credit.undoLast') : t('credit.confirmActionButton')}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -311,6 +382,27 @@ export function CreditAccordionItem({ credit: c, onChanged, hideDebtorName }: Pr
             </div>
           </div>
         </div>
+      )}
+
+      {showPrint && (
+        <ContractPrintView
+          type="credit"
+          vars={{
+            number: c.credit_number ?? c.id.slice(0, 8).toUpperCase(),
+            city: localStorage.getItem('docCity') || '',
+            date: new Date().toLocaleDateString(),
+            amount: Number(c.principal_amount).toLocaleString(),
+            currency: c.currency,
+            takenDate: sorted[0] ? new Date(sorted[0].due_date).toLocaleDateString() : new Date().toLocaleDateString(),
+            interestType: t(`credit.interest_${c.interest_type}`),
+            rate: c.interest_type !== 'none' ? `${c.interest_rate}%` : '0%',
+            term: `${c.term_months} ${t('credit.months')}`,
+            monthlyPayment: sorted[0] ? Number(sorted[0].expected_amount).toLocaleString() : '',
+            companyName: localStorage.getItem('docCompanyName') || '',
+            companyDetails: localStorage.getItem('docCompanyDetails') || '',
+          }}
+          onClose={() => setShowPrint(false)}
+        />
       )}
     </div>
   );

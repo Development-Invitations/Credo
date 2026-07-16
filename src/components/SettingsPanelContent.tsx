@@ -31,6 +31,8 @@ export function SettingsPanelContent() {
     setCallingModuleEnabled,
     smsModuleEnabled,
     setSmsModuleEnabled,
+    documentsModuleEnabled,
+    setDocumentsModuleEnabled,
   } = useApp();
   const {
     currentVersion,
@@ -190,6 +192,16 @@ export function SettingsPanelContent() {
         </div>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8, lineHeight: 1.5 }}>
           {t('settings.smsHint')}
+        </p>
+      </div>
+
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 14 }}>{t('settings.documentsToggle')}</span>
+          <Checkbox checked={documentsModuleEnabled} onChange={setDocumentsModuleEnabled} />
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8, lineHeight: 1.5 }}>
+          {t('settings.documentsHint')}
         </p>
       </div>
 

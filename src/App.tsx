@@ -15,6 +15,7 @@ import { CreditsPage } from './pages/Credits/CreditsPage';
 import { SoundSettingsPage } from './pages/Sound/SoundSettingsPage';
 import { CallingSettingsPage } from './pages/Calling/CallingSettingsPage';
 import { SmsSettingsPage } from './pages/Sms/SmsSettingsPage';
+import { DocumentsSettingsPage } from './pages/Documents/DocumentsSettingsPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { getRememberedEmail } from './lib/session';
 
@@ -135,6 +136,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <SmsSettingsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/documents"
+          element={
+            <PrivateRoute>
+              <DocumentsSettingsPage />
             </PrivateRoute>
           }
         />
