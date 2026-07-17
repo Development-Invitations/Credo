@@ -370,6 +370,7 @@
     "creditsProfitHint": "Jadval bo'yicha qaytariladigan to'liq summa (tan narx + foizlar) bilan berilgan summa o'rtasidagi farq — barcha kreditlar bo'yicha. Bu oy uchun emas, balki kreditlarning butun davri uchun umumiy manzara."
   },
   "debtDetail": {
+    "debtNumber": "Qarz raqami",
     "takenOn": "Olingan",
     "dueDate": "Muddat",
     "paidSoFarLabel": "To'langan",

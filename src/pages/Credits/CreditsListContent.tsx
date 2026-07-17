@@ -280,12 +280,12 @@ export function CreditsListContent({ refreshKey, openClientId }: { refreshKey?: 
             <div
               key={c.id}
               className="card"
-              onClick={() => c.credits.length > 0 && setDetailClientId(c.id)}
+              onClick={() => setDetailClientId(c.id)}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                cursor: c.credits.length > 0 ? 'pointer' : 'default',
+                cursor: 'pointer',
                 borderColor: isOverdue ? 'var(--color-danger)' : 'var(--color-border)',
                 background: isOverdue ? 'color-mix(in srgb, var(--color-danger) 8%, var(--color-surface))' : 'var(--color-surface)',
               }}
@@ -320,7 +320,7 @@ export function CreditsListContent({ refreshKey, openClientId }: { refreshKey?: 
                     {sums.map(([cur, amt]) => `${amt.toLocaleString()} ${cur}`).join(' + ')}
                   </span>
                 )}
-                {c.credits.length > 0 && <ChevronRight size={16} color="var(--color-text-muted)" />}
+                <ChevronRight size={16} color="var(--color-text-muted)" />
               </div>
             </div>
           );

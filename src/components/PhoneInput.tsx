@@ -35,7 +35,7 @@ export function PhoneInput({ value, onChange, placeholder, required, country: co
         className="input"
         value={country}
         onChange={(e) => changeCountry(e.target.value)}
-        style={{ width: 78, flexShrink: 0, padding: '8px 6px', textAlign: 'center', fontSize: 12 }}
+        style={{ width: 98, flexShrink: 0, padding: '8px 6px', textAlign: 'center', fontSize: 12 }}
       >
         {COUNTRY_FORMATS.map((c) => (
           <option key={c.code} value={c.code}>

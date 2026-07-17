@@ -10,6 +10,7 @@ import {
   getDefaultDebtTemplate,
   getDefaultCreditTemplate,
   fillTemplate,
+  isContractHeaderLine,
 } from '../../lib/contractTemplates';
 
 export function DocumentsSettingsPage() {
@@ -290,14 +291,28 @@ export function DocumentsSettingsPage() {
             style={{
               background: '#fff',
               color: '#1a1a1a',
-              whiteSpace: 'pre-wrap',
-              fontFamily: 'Georgia, serif',
-              fontSize: 12.5,
-              lineHeight: 1.7,
+              fontFamily: '"Times New Roman", "PT Serif", Georgia, serif',
+              fontSize: 13,
+              lineHeight: 1.6,
+              textAlign: 'justify',
               minHeight: 400,
             }}
           >
-            {previewText}
+            {previewText.split('\n').map((line, i) => {
+              const header = isContractHeaderLine(line);
+              return (
+                <div
+                  key={i}
+                  style={
+                    header
+                      ? { fontWeight: 700, textAlign: 'center', letterSpacing: 0.3, marginTop: i === 0 ? 0 : 16, marginBottom: 8 }
+                      : { minHeight: '1em' }
+                  }
+                >
+                  {line || '\u00A0'}
+                </div>
+              );
+            })}
             {stampImage && (
               <div style={{ marginTop: 16 }}>
                 <img src={stampImage} alt="stamp" style={{ width: 80, opacity: 0.85 }} />

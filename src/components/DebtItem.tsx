@@ -5,6 +5,7 @@ import { DebtDetailModal } from './DebtDetailModal';
 
 export interface DebtRow {
   id: string;
+  debt_number?: number | null;
   amount: number;
   paid_amount: number;
   currency: string;
@@ -47,8 +48,13 @@ export function DebtItem({ debt, clientId, onChanged, readOnly }: Props) {
         }}
       >
         <div>
-          <div className="amount" style={{ fontSize: 15 }}>
+          <div className="amount" style={{ fontSize: 15, display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             {Number(debt.amount).toLocaleString()} {debt.currency}
+            {debt.debt_number != null && (
+              <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--color-text-muted)' }}>
+                №{debt.debt_number}
+              </span>
+            )}
             {debt.paid_amount > 0 && debt.status === 'active' && (
               <span style={{ fontSize: 12, color: 'var(--color-success)', marginLeft: 8 }}>
                 {t('clientDetail.paidSoFar', { amount: Number(debt.paid_amount).toLocaleString() })}

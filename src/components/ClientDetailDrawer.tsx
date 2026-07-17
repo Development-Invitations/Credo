@@ -43,7 +43,7 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
   async function load() {
     const { data } = await supabase
       .from('debts')
-      .select('id, amount, paid_amount, currency, due_date, status, comment, created_at')
+      .select('id, debt_number, amount, paid_amount, currency, due_date, status, comment, created_at')
       .eq('debtor_id', clientId)
       .order('created_at', { ascending: false });
     setDebts((data as any) ?? []);

@@ -121,6 +121,11 @@ export function DebtDetailModal({ debt, clientId, readOnly, onClose, onChanged }
             <div className="amount" style={{ fontSize: 22, fontWeight: 700 }}>
               {Number(debt.amount).toLocaleString()} {debt.currency}
             </div>
+            {debt.debt_number != null && (
+              <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2 }}>
+                {t('debtDetail.debtNumber')} №{debt.debt_number}
+              </div>
+            )}
             <span
               style={{
                 display: 'inline-block',
@@ -289,7 +294,7 @@ export function DebtDetailModal({ debt, clientId, readOnly, onClose, onChanged }
         <ContractPrintView
           type="debt"
           vars={{
-            number: debt.id.slice(0, 8).toUpperCase(),
+            number: debt.debt_number != null ? String(debt.debt_number) : debt.id.slice(0, 8).toUpperCase(),
             city: localStorage.getItem('docCity') || '',
             date: new Date().toLocaleDateString(),
             amount: Number(debt.amount).toLocaleString(),

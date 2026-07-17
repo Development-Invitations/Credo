@@ -7,6 +7,7 @@ import {
   getDefaultDebtTemplate,
   getDefaultCreditTemplate,
   fillTemplate,
+  isContractHeaderLine,
   ContractVars,
 } from '../lib/contractTemplates';
 
@@ -55,14 +56,28 @@ export function ContractPrintView({ type, vars, schedule, onClose }: Props) {
             width: '210mm',
             minHeight: '297mm',
             padding: '20mm',
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'Georgia, serif',
-            fontSize: 13,
-            lineHeight: 1.8,
+            fontFamily: '"Times New Roman", "PT Serif", Georgia, serif',
+            fontSize: 14,
+            lineHeight: 1.6,
+            textAlign: 'justify',
             boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
           }}
         >
-          {text}
+          {text.split('\n').map((line, i) => {
+            const header = isContractHeaderLine(line);
+            return (
+              <div
+                key={i}
+                style={
+                  header
+                    ? { fontWeight: 700, textAlign: 'center', letterSpacing: 0.4, marginTop: i === 0 ? 0 : 20, marginBottom: 10 }
+                    : { minHeight: '1em' }
+                }
+              >
+                {line || '\u00A0'}
+              </div>
+            );
+          })}
 
           {type === 'credit' && printSchedule && schedule && schedule.length > 0 && (
             <div style={{ marginTop: 24, pageBreakInside: 'avoid' }}>
