@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, BellRing, Phone, Copy, ShieldOff } from 'lucide-react';
+import { Plus, BellRing, Phone, Copy, ShieldOff, Pencil, Mail, MessageSquare } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { Drawer } from './Drawer';
 import { Button } from './Button';
@@ -9,6 +9,7 @@ import { DebtItem, DebtRow } from './DebtItem';
 import { AddDebtModal } from './AddDebtModal';
 import { RemindersModal } from './RemindersModal';
 import { HelpTooltip } from './HelpTooltip';
+import { EditDebtorModal } from './EditDebtorModal';
 
 interface Props {
   clientId: string;
@@ -27,8 +28,27 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
   const [showAddDebt, setShowAddDebt] = useState(false);
   const [showReminders, setShowReminders] = useState(false);
   const [showBlacklistPrompt, setShowBlacklistPrompt] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
   const [blacklistReason, setBlacklistReason] = useState('');
   const callingEnabled = localStorage.getItem('callingEnabled') === 'true';
+
+  // Локальная копия данных клиента — обновляется сразу после редактирования,
+  // не дожидаясь перезагрузки списка у родителя.
+  const [info, setInfo] = useState({
+    full_name: clientName,
+    phone: clientPhone,
+    email: null as string | null,
+    comment: null as string | null,
+  });
+
+  async function loadClientInfo() {
+    const { data } = await supabase
+      .from('debtors')
+      .select('full_name, phone, email, comment')
+      .eq('id', clientId)
+      .maybeSingle();
+    if (data) setInfo(data as any);
+  }
 
   async function sendToBlacklist() {
     await supabase
@@ -53,54 +73,90 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
 
   useEffect(() => {
     load();
+    loadClientInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId]);
 
   return (
-    <Drawer open onClose={onClose} title={clientName}>
-      {clientPhone && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 16 }}>
-          <span>{clientPhone}</span>
-          {callingEnabled && (
-            <button
-              onClick={() => window.open(`tel:${clientPhone.replace(/\s/g, '')}`)}
-              title={t('clientDetail.call') ?? ''}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                color: 'var(--color-accent)',
-                cursor: 'pointer',
-                display: 'flex',
-                padding: 4,
-                borderRadius: 'var(--radius-sm)',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            >
+    <Drawer open onClose={onClose} title={info.full_name}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 16 }}>
+        <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'var(--color-text-muted)' }}>
+          {info.phone && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Phone size={14} />
-            </button>
+              <span>{info.phone}</span>
+              {callingEnabled && (
+                <button
+                  onClick={() => window.open(`tel:${info.phone!.replace(/\s/g, '')}`)}
+                  title={t('clientDetail.call') ?? ''}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: 'var(--color-accent)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    padding: 4,
+                    borderRadius: 'var(--radius-sm)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <Phone size={14} />
+                </button>
+              )}
+              <button
+                onClick={() => navigator.clipboard.writeText(info.phone!)}
+                title={t('clientDetail.copyPhone') ?? ''}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'var(--color-text-muted)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  padding: 4,
+                  borderRadius: 'var(--radius-sm)',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Copy size={14} />
+              </button>
+            </div>
           )}
+          {info.email && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Mail size={14} />
+              <span>{info.email}</span>
+            </div>
+          )}
+          {info.comment && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <MessageSquare size={14} />
+              <span>{info.comment}</span>
+            </div>
+          )}
+        </div>
+        {!readOnly && (
           <button
-            onClick={() => navigator.clipboard.writeText(clientPhone)}
-            title={t('clientDetail.copyPhone') ?? ''}
+            onClick={() => setShowEdit(true)}
+            title={t('clientDetail.editTitle') ?? ''}
             style={{
               background: 'transparent',
-              border: 'none',
-              outline: 'none',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-sm)',
               color: 'var(--color-text-muted)',
               cursor: 'pointer',
               display: 'flex',
-              padding: 4,
-              borderRadius: 'var(--radius-sm)',
+              padding: 8,
+              flexShrink: 0,
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-surface-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            <Copy size={14} />
+            <Pencil size={14} />
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {readOnly && (
         <div
@@ -219,7 +275,22 @@ export function ClientDetailDrawer({ clientId, clientName, clientPhone, defaultC
       )}
 
       {showReminders && (
-        <RemindersModal debtorId={clientId} debtorName={clientName} onClose={() => setShowReminders(false)} />
+        <RemindersModal debtorId={clientId} debtorName={info.full_name} onClose={() => setShowReminders(false)} />
+      )}
+
+      {showEdit && (
+        <EditDebtorModal
+          clientId={clientId}
+          initialFullName={info.full_name}
+          initialPhone={info.phone}
+          initialEmail={info.email}
+          initialComment={info.comment}
+          onClose={() => setShowEdit(false)}
+          onSaved={(updated) => {
+            setInfo((prev) => ({ ...prev, ...updated }));
+            onDebtsChanged();
+          }}
+        />
       )}
     </Drawer>
   );

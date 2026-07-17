@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Phone, Copy, Landmark, Mail, FileText, MapPin } from 'lucide-react';
+import { Phone, Copy, Landmark, Mail, FileText, MapPin, Pencil } from 'lucide-react';
 import { Drawer } from './Drawer';
 import { Button } from './Button';
 import { supabase } from '../lib/supabaseClient';
 import { CreditAccordionItem, CreditData } from './CreditAccordionItem';
 import { CreateCreditModal } from './CreateCreditModal';
+import { EditCreditClientModal } from './EditCreditClientModal';
 import { useApp } from '../context/AppContext';
 
 interface ClientInfo {
@@ -14,6 +15,7 @@ interface ClientInfo {
   email: string | null;
   passport_data: string | null;
   address: string | null;
+  comment: string | null;
 }
 
 interface Props {
@@ -29,12 +31,13 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
   const [credits, setCredits] = useState<CreditData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateCredit, setShowCreateCredit] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
   const callingEnabled = localStorage.getItem('callingEnabled') === 'true';
 
   async function load() {
     const { data: clientData } = await supabase
       .from('credit_clients')
-      .select('full_name, phone, email, passport_data, address')
+      .select('full_name, phone, email, passport_data, address, comment')
       .eq('id', clientId)
       .maybeSingle();
     setClient(clientData ?? null);
@@ -88,7 +91,8 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
 
   return (
     <Drawer open onClose={onClose} title={client?.full_name ?? ''}>
-      <div className="card" style={{ marginBottom: 16, display: 'grid', gap: 8, fontSize: 13 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 16 }}>
+        <div className="card" style={{ flex: 1, display: 'grid', gap: 8, fontSize: 13, margin: 0 }}>
         {client?.phone && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Phone size={14} color="var(--color-text-muted)" />
@@ -151,9 +155,29 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
             {client.address}
           </div>
         )}
+        {client?.comment && (
+          <div style={{ color: 'var(--color-text-muted)' }}>{client.comment}</div>
+        )}
         {!client?.phone && !client?.email && !client?.passport_data && !client?.address && (
           <div style={{ color: 'var(--color-text-muted)' }}>{t('credit.noExtraData')}</div>
         )}
+        </div>
+        <button
+          onClick={() => setShowEdit(true)}
+          title={t('clientDetail.editTitle') ?? ''}
+          style={{
+            background: 'transparent',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-sm)',
+            color: 'var(--color-text-muted)',
+            cursor: 'pointer',
+            display: 'flex',
+            padding: 8,
+            flexShrink: 0,
+          }}
+        >
+          <Pencil size={14} />
+        </button>
       </div>
 
       <Button
@@ -184,6 +208,23 @@ export function CreditClientDetailDrawer({ clientId, onClose, onChanged }: Props
           defaultCurrency={currency}
           onClose={() => setShowCreateCredit(false)}
           onCreated={load}
+        />
+      )}
+
+      {showEdit && client && (
+        <EditCreditClientModal
+          clientId={clientId}
+          initialFullName={client.full_name}
+          initialPhone={client.phone}
+          initialEmail={client.email}
+          initialPassportData={client.passport_data}
+          initialAddress={client.address}
+          initialComment={client.comment}
+          onClose={() => setShowEdit(false)}
+          onSaved={(updated) => {
+            setClient((prev) => (prev ? { ...prev, ...updated } : prev));
+            onChanged();
+          }}
         />
       )}
     </Drawer>

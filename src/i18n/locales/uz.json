@@ -190,14 +190,18 @@
     "empty": "Arxiv bo'sh",
     "restore": "Qaytarish",
     "archiveAction": "Arxivlash",
+    "tabDebtors": "Qarzdorlar",
+    "tabCreditClients": "Kredit mijozlari",
     "explainer": "Arxivdagi mijozlar bosh sahifada ko'rinmaydi va bildirishnomalarga tushmaydi. Ularning qarz tarixi saqlanadi — yangi qarz qo'shish uchun mijozni tiklang.",
     "confirmWithDebt": "Bu mijozning to'lanmagan qarzi bor. Baribir arxivlansinmi? U muddati o'tgan bildirishnomalardan yo'qoladi.",
+    "confirmWithCredit": "Bu mijozning to'lanmagan krediti bor. Baribir arxivlansinmi? U muddati o'tgan bildirishnomalardan yo'qoladi.",
     "readOnlyNotice": "Mijoz arxivda — faqat tarixni ko'rish mumkin. Yangi qarz qo'shish uchun uni tiklang."
   },
   "debtForm": {
     "title": "Yangi qarz"
   },
   "clientDetail": {
+    "editTitle": "Ma'lumotlarni tahrirlash",
     "addDebt": "Qarz qo'shish",
     "debtsHistory": "Qarzlar tarixi",
     "noDebts": "Hali qarz yo'q",

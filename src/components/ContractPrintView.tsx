@@ -47,7 +47,7 @@ export function ContractPrintView({ type, vars, schedule, onClose }: Props) {
           {t('documents.printButton')}
         </Button>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', justifyContent: 'center', padding: 24 }}>
+      <div className="contract-scroll-area" style={{ flex: 1, overflowY: 'auto', display: 'flex', justifyContent: 'center', padding: 24 }}>
         <div
           className="contract-page"
           style={{
@@ -114,16 +114,32 @@ export function ContractPrintView({ type, vars, schedule, onClose }: Props) {
       <style>{`
         @media print {
           .no-print { display: none !important; }
-          .contract-overlay { position: static !important; background: none !important; }
+          html, body { height: auto !important; }
+          .contract-overlay {
+            position: static !important;
+            background: none !important;
+            display: block !important;
+            height: auto !important;
+          }
+          /* Контейнер предпросмотра прокручивался (overflow-y: auto) — при печати браузер/Electron
+             захватывает только видимую (проскроленную) часть такого блока, из-за чего всё, что
+             находится ниже первой "страницы" на экране (включая график платежей), обрезалось.
+             Убираем прокрутку и фиксированную высоту, чтобы весь документ попадал в нормальный
+             поток и корректно разбивался на несколько печатных страниц. */
+          .contract-scroll-area {
+            overflow: visible !important;
+            height: auto !important;
+            display: block !important;
+            padding: 0 !important;
+          }
           body * { visibility: hidden; }
           .contract-page, .contract-page * { visibility: visible; }
           .contract-page {
-            position: absolute;
-            left: 0;
-            top: 0;
+            position: static !important;
             box-shadow: none !important;
-            width: auto !important;
+            width: 210mm !important;
             min-height: auto !important;
+            margin: 0 auto;
           }
         }
       `}</style>

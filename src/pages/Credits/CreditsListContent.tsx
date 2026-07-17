@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, AlertTriangle, ArrowUpDown, Search } from 'lucide-react';
+import { ChevronRight, AlertTriangle, ArrowUpDown, Search, Archive as ArchiveIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import type { CreditData } from '../../components/CreditAccordionItem';
 import { CreditClientDetailDrawer } from '../../components/CreditClientDetailDrawer';
@@ -118,6 +118,12 @@ export function CreditsListContent({ refreshKey, openClientId }: { refreshKey?: 
   useEffect(() => {
     setPage(1);
   }, [activeTab, dateSort, search]);
+
+  async function archiveClient(c: ClientCredits, hasOutstanding: boolean) {
+    if (hasOutstanding && !window.confirm(t('archive.confirmWithCredit') ?? '')) return;
+    await supabase.from('credit_clients').update({ archived_at: new Date().toISOString() }).eq('id', c.id);
+    load();
+  }
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -314,12 +320,27 @@ export function CreditsListContent({ refreshKey, openClientId }: { refreshKey?: 
                     : t('dashboard.statusPaid')}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={(e) => e.stopPropagation()}>
                 {sums.length > 0 && (
                   <span className="amount" style={{ fontSize: 15 }}>
                     {sums.map(([cur, amt]) => `${amt.toLocaleString()} ${cur}`).join(' + ')}
                   </span>
                 )}
+                <button
+                  onClick={() => archiveClient(c, sums.length > 0)}
+                  title={t('archive.archiveAction') ?? ''}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    color: 'var(--color-text-muted)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    padding: 8,
+                  }}
+                >
+                  <ArchiveIcon size={15} />
+                </button>
                 <ChevronRight size={16} color="var(--color-text-muted)" />
               </div>
             </div>
